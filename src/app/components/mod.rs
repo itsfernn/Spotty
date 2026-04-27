@@ -61,6 +61,9 @@ pub use device_selector::*;
 mod saved_tracks;
 pub use saved_tracks::*;
 
+mod top_tracks;
+pub use top_tracks::*;
+
 mod user_menu;
 pub use user_menu::*;
 

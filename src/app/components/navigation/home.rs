@@ -14,6 +14,7 @@ impl HomePane {
         let library = screen_factory.make_library();
         let saved_playlists = screen_factory.make_saved_playlists();
         let saved_tracks = screen_factory.make_saved_tracks();
+        let top_tracks = screen_factory.make_top_tracks();
         let now_playing = screen_factory.make_now_playing();
         let sidebar = screen_factory.make_sidebar(listbox);
 
@@ -30,6 +31,13 @@ impl HomePane {
         let dest = SidebarDestination::SavedTracks;
         stack.add_titled(
             saved_tracks.get_root_widget(),
+            Option::from(dest.id()),
+            &dest.title(),
+        );
+
+        let dest = SidebarDestination::TopTracks;
+        stack.add_titled(
+            top_tracks.get_root_widget(),
             Option::from(dest.id()),
             &dest.title(),
         );
@@ -55,6 +63,7 @@ impl HomePane {
                 Box::new(library),
                 Box::new(saved_playlists),
                 Box::new(saved_tracks),
+                Box::new(top_tracks),
                 Box::new(now_playing),
             ],
         }

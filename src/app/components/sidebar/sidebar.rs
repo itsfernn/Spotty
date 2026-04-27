@@ -14,7 +14,7 @@ use crate::app::{
     EventListener,
 };
 
-const NUM_FIXED_ENTRIES: u32 = 5;
+const NUM_FIXED_ENTRIES: u32 = 6;
 const NUM_PLAYLISTS: usize = 20;
 
 pub struct SidebarModel {
@@ -66,6 +66,7 @@ impl SidebarModel {
         let actions = match dest {
             SidebarDestination::Library
             | SidebarDestination::SavedTracks
+            | SidebarDestination::TopTracks
             | SidebarDestination::SavedPlaylists
             | SidebarDestination::NowPlaying => {
                 vec![
@@ -100,6 +101,7 @@ impl Sidebar {
 
         list_store.append(&SidebarItem::from_destination(SidebarDestination::Library));
         list_store.append(&SidebarItem::from_destination(SidebarDestination::SavedTracks));
+        list_store.append(&SidebarItem::from_destination(SidebarDestination::TopTracks));
         list_store.append(&SidebarItem::from_destination(SidebarDestination::SavedPlaylists));
         list_store.append(&SidebarItem::playlists_section());
         list_store.append(&SidebarItem::create_playlist_item());

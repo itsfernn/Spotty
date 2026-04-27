@@ -34,6 +34,8 @@ pub trait SpotifyApiClient {
         limit: usize,
     ) -> BoxFuture<SpotifyResult<SongBatch>>;
 
+    fn get_top_tracks(&self, offset: usize, limit: usize) -> BoxFuture<SpotifyResult<SongBatch>>;
+
     fn get_saved_albums(
         &self,
         offset: usize,
@@ -132,6 +134,7 @@ pub trait SpotifyApiClient {
 enum RiffCacheKey<'a> {
     SavedAlbums(usize, usize),
     SavedTracks(usize, usize),
+    TopTracks(usize, usize),
     SavedPlaylists(usize, usize),
     Album(&'a str),
     AlbumLiked(&'a str),
@@ -150,6 +153,7 @@ impl RiffCacheKey<'_> {
         match self {
             Self::SavedAlbums(offset, limit) => format!("me_albums_{offset}_{limit}.json"),
             Self::SavedTracks(offset, limit) => format!("me_tracks_{offset}_{limit}.json"),
+            Self::TopTracks(offset, limit) => format!("me_top_tracks_{offset}_{limit}.json"),
             Self::SavedPlaylists(offset, limit) => format!("me_playlists_{offset}_{limit}.json"),
             Self::Album(id) => format!("album_{id}.json"),
             Self::AlbumTracks(id, offset, limit) => {
@@ -175,6 +179,8 @@ impl RiffCacheKey<'_> {
 
 lazy_static! {
     pub static ref ME_TRACKS_CACHE: Regex = Regex::new(r"^me_tracks_\w+_\w+\.json$").unwrap();
+    pub static ref ME_TOP_TRACKS_CACHE: Regex =
+        Regex::new(r"^me_top_tracks_\w+_\w+\.json$").unwrap();
     pub static ref ME_ALBUMS_CACHE: Regex = Regex::new(r"^me_albums_\w+_\w+\.json$").unwrap();
     pub static ref USER_CACHE: Regex =
         Regex::new(r"^me_(albums|playlists|tracks)_\w+_\w+\.json$").unwrap();
@@ -292,6 +298,21 @@ impl SpotifyApiClient for CachedSpotifyClient {
                 .collect::<Vec<AlbumDescription>>();
 
             Ok(albums)
+        })
+    }
+
+    fn get_top_tracks(&self, offset: usize, limit: usize) -> BoxFuture<SpotifyResult<SongBatch>> {
+        Box::pin(async move {
+            let page = self
+                .cache_get_or_write(RiffCacheKey::TopTracks(offset, limit), None, |etag| {
+                    self.client
+                        .get_top_tracks(offset, limit)
+                        .etag(etag)
+                        .send()
+                })
+                .await?;
+
+            Ok(SongBatch::from(page))
         })
     }
 

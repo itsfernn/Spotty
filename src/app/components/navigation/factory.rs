@@ -83,6 +83,23 @@ impl ScreenFactory {
         )
     }
 
+    pub fn make_top_tracks(&self) -> impl ListenerComponent {
+        let screen_model = DefaultHeaderBarModel::new(
+            Some(gettext("Top tracks")),
+            Some(SelectionContext::TopTracks),
+            Rc::clone(&self.app_model),
+            self.dispatcher.box_clone(),
+        );
+        let model = Rc::new(TopTracksModel::new(
+            Rc::clone(&self.app_model),
+            self.dispatcher.box_clone(),
+        ));
+        StandardScreen::new(
+            TopTracks::new(model, self.worker.clone()),
+            Rc::new(screen_model),
+        )
+    }
+
     pub fn make_album_details(&self, id: String) -> impl ListenerComponent {
         let model = Rc::new(DetailsModel::new(
             id,

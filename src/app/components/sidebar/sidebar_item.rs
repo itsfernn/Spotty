@@ -7,6 +7,7 @@ use crate::app::models::PlaylistSummary;
 
 const LIBRARY: &str = "library";
 const SAVED_TRACKS: &str = "saved_tracks";
+const TOP_TRACKS: &str = "top_tracks";
 const NOW_PLAYING: &str = "now_playing";
 const SAVED_PLAYLISTS: &str = "saved_playlists";
 const PLAYLIST: &str = "playlist";
@@ -17,6 +18,7 @@ pub const CREATE_PLAYLIST_ITEM: &str = "create_playlist";
 pub enum SidebarDestination {
     Library,
     SavedTracks,
+    TopTracks,
     NowPlaying,
     SavedPlaylists,
     Playlist(PlaylistSummary),
@@ -27,6 +29,7 @@ impl SidebarDestination {
         match self {
             Self::Library => LIBRARY,
             Self::SavedTracks => SAVED_TRACKS,
+            Self::TopTracks => TOP_TRACKS,
             Self::NowPlaying => NOW_PLAYING,
             Self::SavedPlaylists => SAVED_PLAYLISTS,
             Self::Playlist(_) => PLAYLIST,
@@ -39,6 +42,8 @@ impl SidebarDestination {
             Self::Library => gettext("Albums"),
             // translators: This is a sidebar entry to browse to saved tracks.
             Self::SavedTracks => gettext("Tracks"),
+            // translators: This is a sidebar entry to browse to top tracks.
+            Self::TopTracks => gettext("Top tracks"),
             // translators: This is a sidebar entry to browse to saved playlists.
             Self::NowPlaying => gettext("Now playing"),
             // translators: This is a sidebar entry that marks that the entries below are playlists.
@@ -51,6 +56,7 @@ impl SidebarDestination {
         match self {
             Self::Library => "tools-media-optical-format-symbolic",
             Self::SavedTracks => "library-music-symbolic",
+            Self::TopTracks => "go-up-symbolic",
             Self::NowPlaying => "music-queue-symbolic",
             Self::SavedPlaylists => "view-media-lyrics-symbolic",
             Self::Playlist(_) => "playlist2-symbolic",
@@ -101,6 +107,7 @@ impl SidebarItem {
             match id.as_str() {
                 LIBRARY => Some(SidebarDestination::Library),
                 SAVED_TRACKS => Some(SidebarDestination::SavedTracks),
+                TOP_TRACKS => Some(SidebarDestination::TopTracks),
                 NOW_PLAYING => Some(SidebarDestination::NowPlaying),
                 SAVED_PLAYLISTS => Some(SidebarDestination::SavedPlaylists),
                 PLAYLIST => Some(SidebarDestination::Playlist(PlaylistSummary {

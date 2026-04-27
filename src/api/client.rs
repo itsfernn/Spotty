@@ -460,7 +460,7 @@ impl SpotifyClient {
         &self,
         offset: usize,
         limit: usize,
-    ) -> SpotifyRequest<'_, (), Page<SavedTrack>> {
+    ) -> SpotifyRequest<'_, (), Page<TrackItem>> {
         let query = make_query_params()
             .append_pair("offset", &offset.to_string()[..])
             .append_pair("limit", &limit.to_string()[..])

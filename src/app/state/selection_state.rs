@@ -37,6 +37,7 @@ pub enum SelectionContext {
     Playlist,
     EditablePlaylist(String),
     SavedTracks,
+    TopTracks,
     Default,
 }
 

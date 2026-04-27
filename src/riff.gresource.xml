@@ -34,6 +34,8 @@
     <file alias="components/device_selector.ui">app/components/device_selector/device_selector.ui</file>
     <!-- liked songs -->
     <file alias="components/saved_tracks.ui">app/components/saved_tracks/saved_tracks.ui</file>
+    <!-- top tracks -->
+    <file alias="components/top_tracks.ui">app/components/top_tracks/top_tracks.ui</file>
     <!-- song -->
     <file alias="components/song.css">app/components/playlist/song.css</file>
     <file alias="components/song.ui">app/components/playlist/song.ui</file>

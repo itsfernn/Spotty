@@ -17,6 +17,7 @@ pub enum SongsSource {
     Playlist(String),
     Album(String),
     SavedTracks,
+    TopTracks,
 }
 
 impl PartialEq for SongsSource {
@@ -25,6 +26,7 @@ impl PartialEq for SongsSource {
             (Self::Playlist(l), Self::Playlist(r)) => l == r,
             (Self::Album(l), Self::Album(r)) => l == r,
             (Self::SavedTracks, Self::SavedTracks) => true,
+            (Self::TopTracks, Self::TopTracks) => true,
             _ => false,
         }
     }
@@ -87,6 +89,7 @@ impl BatchLoader {
             SongsSource::Playlist(id) => api.get_playlist_tracks(id, offset, batch_size).await,
             SongsSource::SavedTracks => api.get_saved_tracks(offset, batch_size).await,
             SongsSource::Album(id) => api.get_album_tracks(id, offset, batch_size).await,
+            SongsSource::TopTracks => api.get_top_tracks(offset, batch_size).await,
         };
 
         match result {

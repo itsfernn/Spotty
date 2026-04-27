@@ -211,6 +211,14 @@ impl SelectionToolbar {
                 self.widget.set_remove(SelectionToolState::Hidden);
                 self.widget.set_save(SelectionToolState::Hidden);
             }
+            SelectionContext::TopTracks => {
+                self.widget.set_move(SelectionToolState::Hidden);
+                self.widget
+                    .set_queue(SelectionToolState::Visible(count > 0));
+                self.widget.set_add(SelectionToolState::Visible(count > 0));
+                self.widget.set_remove(SelectionToolState::Hidden);
+                self.widget.set_save(SelectionToolState::Visible(count > 0));
+            }
             SelectionContext::EditablePlaylist(_) => {
                 self.widget.set_move(SelectionToolState::Hidden);
                 self.widget

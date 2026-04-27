@@ -208,6 +208,7 @@ pub struct HomeState {
     pub next_playlists_page: Pagination<()>,
     pub playlists: ListStore<AlbumModel>,
     pub saved_tracks: SongListModel,
+    pub top_tracks: SongListModel,
 }
 
 impl Default for HomeState {
@@ -220,6 +221,7 @@ impl Default for HomeState {
             next_playlists_page: Pagination::new((), 30),
             playlists: ListStore::new(),
             saved_tracks: SongListModel::new(50),
+            top_tracks: SongListModel::new(50),
         }
     }
 }
@@ -320,6 +322,26 @@ impl UpdatableState for HomeState {
             BrowserAction::RemoveSavedTracks(tracks) => {
                 self.saved_tracks.remove(&tracks[..]).commit();
                 vec![BrowserEvent::SavedTracksUpdated]
+            }
+            BrowserAction::SetTopTracks(song_batch) => {
+                let song_batch = *song_batch.clone();
+                if self
+                    .top_tracks
+                    .clear()
+                    .and(|s| s.add(song_batch))
+                    .commit()
+                {
+                    vec![BrowserEvent::TopTracksUpdated]
+                } else {
+                    vec![]
+                }
+            }
+            BrowserAction::AppendTopTracks(song_batch) => {
+                if self.top_tracks.add(*song_batch.clone()).commit() {
+                    vec![BrowserEvent::TopTracksUpdated]
+                } else {
+                    vec![]
+                }
             }
             _ => vec![],
         }
