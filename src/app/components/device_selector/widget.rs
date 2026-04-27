@@ -31,9 +31,6 @@ mod imp {
         pub devices: TemplateChild<gtk::Box>,
 
         #[template_child]
-        pub this_device_button: TemplateChild<gtk::CheckButton>,
-
-        #[template_child]
         pub menu: TemplateChild<gio::MenuModel>,
 
         pub action_group: SimpleActionGroup,
@@ -64,16 +61,17 @@ mod imp {
             popover.set_parent(&*self.obj());
             popover.set_autohide(true);
 
-            let this_device = &*self.this_device_button;
-            this_device.set_action_name(Some(&format!("{}.{}", ACTIONS, CONNECT_ACTION)));
-            this_device.set_action_target_value(Some(&Option::<String>::None.to_variant()));
-
             self.obj()
                 .insert_action_group(ACTIONS, Some(&self.action_group));
+
+            let action_group = self.action_group.clone();
             self.obj().connect_clicked(clone!(
                 #[weak]
                 popover,
                 move |_| {
+                    if let Some(action) = action_group.lookup_action(REFRESH_ACTION) {
+                        action.activate(None);
+                    }
                     popover.set_visible(true);
                     popover.present();
                     popover.grab_focus();
@@ -153,7 +151,6 @@ impl DeviceSelectorWidget {
 
     pub fn update_devices_list(&self, devices: &[ConnectDevice]) {
         let widget = self.imp();
-        widget.this_device_button.set_sensitive(!devices.is_empty());
 
         while let Some(child) = widget.devices.upcast_ref::<gtk::Widget>().first_child() {
             widget.devices.remove(&child);
@@ -163,9 +160,14 @@ impl DeviceSelectorWidget {
             let check = gtk::CheckButton::builder()
                 .action_name(format!("{}.{}", ACTIONS, CONNECT_ACTION))
                 .action_target(&Some(&device.id).to_variant())
-                .group(&*widget.this_device_button)
                 .label(&device.label)
                 .build();
+            // First device acts as the radio group anchor
+            if let Some(first_child) = widget.devices.first_child() {
+                if let Some(anchor) = first_child.downcast_ref::<gtk::CheckButton>() {
+                    check.set_group(Some(anchor));
+                }
+            }
             widget.devices.append(&check);
         }
     }

@@ -3,6 +3,7 @@ use gtk::subclass::prelude::*;
 use gtk::{glib, CompositeTemplate};
 
 use crate::app::components::display_add_css_provider;
+use crate::app::components::device_selector::DeviceSelectorWidget;
 use crate::app::components::utils::{format_duration, Clock, Debouncer};
 use crate::app::loader::ImageLoader;
 use crate::app::models::RepeatMode;
@@ -35,6 +36,9 @@ mod imp {
 
         #[template_child]
         pub volume_slider: TemplateChild<gtk::Scale>,
+
+        #[template_child]
+        pub device_selector: TemplateChild<DeviceSelectorWidget>,
 
         pub clock: Clock,
     }
@@ -195,6 +199,10 @@ impl PlaybackWidget {
     pub fn set_volume(&self, value: f64) {
         let widget = self.imp();
         widget.volume_slider.set_value(value)
+    }
+
+    pub fn device_selector_widget(&self) -> DeviceSelectorWidget {
+        self.imp().device_selector.clone()
     }
 
     pub fn connect_play_pause<F>(&self, f: F)

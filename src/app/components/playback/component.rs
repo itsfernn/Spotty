@@ -1,9 +1,10 @@
 use std::ops::Deref;
 use std::rc::Rc;
 
+use crate::app::components::device_selector::{DeviceSelector, DeviceSelectorModel};
 use crate::app::components::EventListener;
 use crate::app::models::*;
-use crate::app::state::{PlaybackAction, PlaybackEvent, ScreenName, SelectionEvent};
+use crate::app::state::{LoginEvent, PlaybackAction, PlaybackEvent, ScreenName, SelectionEvent};
 use crate::app::{
     ActionDispatcher, AppAction, AppEvent, AppModel, AppState, BrowserAction, Worker,
 };
@@ -76,12 +77,17 @@ impl PlaybackModel {
         self.dispatcher
             .dispatch(PlaybackAction::SetVolume(value).into())
     }
+
+    pub fn device_selector_model(&self) -> DeviceSelectorModel {
+        DeviceSelectorModel::new(self.app_model.clone(), self.dispatcher.box_clone())
+    }
 }
 
 pub struct PlaybackControl {
     model: Rc<PlaybackModel>,
     widget: PlaybackWidget,
     worker: Worker,
+    device_selector: DeviceSelector,
 }
 
 impl PlaybackControl {
@@ -129,10 +135,16 @@ impl PlaybackControl {
             move |value| model.set_volume(value)
         ));
 
+        let device_selector = DeviceSelector::new(
+            widget.device_selector_widget(),
+            model.device_selector_model(),
+        );
+
         Self {
             model,
             widget,
             worker,
+            device_selector,
         }
     }
 
@@ -169,6 +181,7 @@ impl PlaybackControl {
 
 impl EventListener for PlaybackControl {
     fn on_event(&mut self, event: &AppEvent) {
+        self.device_selector.on_event(event);
         match event {
             AppEvent::PlaybackEvent(PlaybackEvent::PlaybackPaused)
             | AppEvent::PlaybackEvent(PlaybackEvent::PlaybackResumed) => {

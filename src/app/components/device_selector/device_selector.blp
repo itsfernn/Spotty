@@ -6,7 +6,6 @@ template $DeviceSelectorWidget : Button {
     halign: center;
     hexpand: false;
     icon-name: "audio-x-generic-symbolic";
-    label: _("This device");
   }
 }
 
@@ -18,13 +17,6 @@ menu menu {
       custom: "custom_content";
     }
   }
-
-  section {
-    item {
-      label: _("Refresh devices");
-      action: "devices.refresh";
-    }
-  }
 }
 
 PopoverMenu popover {
@@ -32,11 +24,6 @@ PopoverMenu popover {
 
 Box custom_content {
   orientation: vertical;
-
-  CheckButton this_device_button {
-    label: _("This device");
-    sensitive: false;
-  }
 
   Box devices {
     orientation: vertical;

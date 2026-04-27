@@ -5,8 +5,7 @@ use std::rc::Rc;
 
 use super::NowPlayingModel;
 use crate::app::components::{
-    Component, DeviceSelector, DeviceSelectorWidget, EventListener, HeaderBarComponent,
-    HeaderBarWidget, Playlist,
+    Component, EventListener, HeaderBarComponent, HeaderBarWidget, Playlist,
 };
 use crate::app::state::PlaybackEvent;
 use crate::app::{AppEvent, Worker};
@@ -23,9 +22,6 @@ mod imp {
 
         #[template_child]
         pub headerbar: TemplateChild<HeaderBarWidget>,
-
-        #[template_child]
-        pub device_selector: TemplateChild<DeviceSelectorWidget>,
 
         #[template_child]
         pub scrolled_window: TemplateChild<gtk::ScrolledWindow>,
@@ -80,10 +76,6 @@ impl NowPlayingWidget {
     fn headerbar_widget(&self) -> &HeaderBarWidget {
         self.imp().headerbar.as_ref()
     }
-
-    fn device_selector_widget(&self) -> &DeviceSelectorWidget {
-        self.imp().device_selector.as_ref()
-    }
 }
 
 pub struct NowPlaying {
@@ -116,15 +108,10 @@ impl NowPlaying {
             model.to_headerbar_model(),
         ));
 
-        let device_selector = Box::new(DeviceSelector::new(
-            widget.device_selector_widget().clone(),
-            model.device_selector_model(),
-        ));
-
         Self {
             widget,
             model,
-            children: vec![playlist, headerbar, device_selector],
+            children: vec![playlist, headerbar],
         }
     }
 }
