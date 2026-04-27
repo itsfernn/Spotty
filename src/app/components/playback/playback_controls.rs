@@ -13,6 +13,9 @@ mod imp {
     #[template(resource = "/dev/diegovsky/Riff/components/playback_controls.ui")]
     pub struct PlaybackControlsWidget {
         #[template_child]
+        pub queue: TemplateChild<gtk::Button>,
+
+        #[template_child]
         pub play_pause: TemplateChild<gtk::Button>,
 
         #[template_child]
@@ -84,6 +87,13 @@ impl PlaybackControlsWidget {
         };
 
         self.imp().repeat.set_icon_name(repeat_mode_icon);
+    }
+
+    pub fn connect_queue_clicked<F>(&self, f: F)
+    where
+        F: Fn() + 'static,
+    {
+        self.imp().queue.connect_clicked(move |_| f());
     }
 
     pub fn connect_play_pause<F>(&self, f: F)

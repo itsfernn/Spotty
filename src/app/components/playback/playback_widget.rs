@@ -219,6 +219,13 @@ impl PlaybackWidget {
         self.imp().device_selector.clone()
     }
 
+    pub fn connect_queue_clicked<F>(&self, f: F)
+    where
+        F: Fn() + 'static,
+    {
+        self.imp().controls.connect_queue_clicked(f);
+    }
+
     pub fn connect_play_pause<F>(&self, f: F)
     where
         F: Fn() + Clone + 'static,

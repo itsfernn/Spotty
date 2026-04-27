@@ -68,6 +68,7 @@ template $PlaybackWidget : Box {
     }
 
     child: Grid desktop-grid  {
+      column-homogeneous: false;
       halign: fill;
       hexpand: true;
 
@@ -92,6 +93,7 @@ template $PlaybackWidget : Box {
 
       $PlaybackControlsWidget controls {
         halign: center;
+        hexpand: true;
         layout {
           column-span: "1";
           column: "2";
@@ -102,7 +104,7 @@ template $PlaybackWidget : Box {
 
       Stack volume-stack {
         visible-child-name: "slider";
-        hexpand: true;
+        hexpand: false;
 
         layout {
           column-span: "1";

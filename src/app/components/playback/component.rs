@@ -143,6 +143,12 @@ impl PlaybackControl {
             move |value| model.set_volume(value)
         ));
 
+        widget.connect_queue_clicked(clone!(
+            #[weak]
+            model,
+            move || model.go_home()
+        ));
+
         widget.connect_album_clicked(clone!(
             #[weak]
             model,
