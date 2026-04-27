@@ -81,6 +81,14 @@ impl PlaybackModel {
     pub fn device_selector_model(&self) -> DeviceSelectorModel {
         DeviceSelectorModel::new(self.app_model.clone(), self.dispatcher.box_clone())
     }
+
+    fn view_album(&self, id: String) {
+        self.dispatcher.dispatch(AppAction::ViewAlbum(id));
+    }
+
+    fn view_artist(&self, id: String) {
+        self.dispatcher.dispatch(AppAction::ViewArtist(id));
+    }
 }
 
 pub struct PlaybackControl {
@@ -133,6 +141,28 @@ impl PlaybackControl {
             #[weak]
             model,
             move |value| model.set_volume(value)
+        ));
+
+        widget.connect_album_clicked(clone!(
+            #[weak]
+            model,
+            move || {
+                if let Some(song) = model.current_song() {
+                    model.view_album(song.album.id);
+                }
+            }
+        ));
+
+        widget.connect_artist_clicked(clone!(
+            #[weak]
+            model,
+            move || {
+                if let Some(song) = model.current_song() {
+                    if let Some(artist) = song.artists.first() {
+                        model.view_artist(artist.id.clone());
+                    }
+                }
+            }
         ));
 
         let device_selector = DeviceSelector::new(

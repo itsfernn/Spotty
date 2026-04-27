@@ -140,7 +140,21 @@ impl PlaybackWidget {
     {
         let widget = self.imp();
         let f_clone = f.clone();
-        widget.now_playing.connect_clicked(move |_| f_clone());
+        widget.now_playing.connect_now_playing_clicked(move || f_clone());
+    }
+
+    pub fn connect_album_clicked<F>(&self, f: F)
+    where
+        F: Fn() + 'static,
+    {
+        self.imp().now_playing.connect_album_clicked(f);
+    }
+
+    pub fn connect_artist_clicked<F>(&self, f: F)
+    where
+        F: Fn() + 'static,
+    {
+        self.imp().now_playing.connect_artist_clicked(f);
     }
 
     pub fn connect_seek<Seek>(&self, seek: Seek)

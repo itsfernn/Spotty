@@ -1,43 +1,43 @@
 using Gtk 4.0;
 
-template $PlaybackInfoWidget : Button {
-  receives-default: true;
+template $PlaybackInfoWidget : Box {
   halign: start;
   valign: center;
-  has-frame: false;
-
-  layout {
-    column-span: "1";
-    column: "0";
-    row: "0";
-  }
 
   Box {
     halign: center;
 
     Picture playing_image {
-      width-request: 50;
-      height-request: 50;
+      width-request: 80;
+      height-request: 80;
       content-fit: cover;
     }
 
-    Label current_song_info {
-      visible: false;
-      halign: start;
+    Box {
+      orientation: vertical;
+      valign: center;
       hexpand: true;
-      margin-start: 12;
-      margin-end: 12;
 
-      /* Translators: Short text displayed instead of a song title when nothing plays */
+      Button title_button {
+        has-frame: false;
+        halign: start;
+        Label {
+          use-markup: true;
+          lines: 1;
+          xalign: 0;
+        }
+      }
 
-      label: _("No song playing");
-      use-markup: true;
-      ellipsize: middle;
-      lines: 1;
+      Button artist_button {
+        has-frame: false;
+        halign: start;
+        Label {
+          use-markup: true;
+          ellipsize: end;
+          lines: 1;
+          xalign: 0;
+        }
+      }
     }
   }
-
-  // styles [
-  //   "body",
-  // ]
 }
