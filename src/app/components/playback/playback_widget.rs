@@ -40,6 +40,9 @@ mod imp {
         #[template_child]
         pub device_selector: TemplateChild<DeviceSelectorWidget>,
 
+        #[template_child]
+        pub queue: TemplateChild<gtk::Button>,
+
         pub clock: Clock,
     }
 
@@ -223,7 +226,7 @@ impl PlaybackWidget {
     where
         F: Fn() + 'static,
     {
-        self.imp().controls.connect_queue_clicked(f);
+        self.imp().queue.connect_clicked(move |_| f());
     }
 
     pub fn connect_play_pause<F>(&self, f: F)
