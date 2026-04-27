@@ -1,7 +1,6 @@
 use crate::app::models::{ConnectDevice, ConnectDeviceKind};
 use crate::app::state::Device;
 use gdk::prelude::FromVariant;
-use gettextrs::gettext;
 use gio::{Action, SimpleAction, SimpleActionGroup};
 use gtk::prelude::*;
 use gtk::subclass::prelude::*;
@@ -132,10 +131,6 @@ impl DeviceSelectorWidget {
             };
             action.change_state(&device_id.to_variant());
         }
-        let label = match device {
-            None => gettext("No device"),
-            Some(connect) => connect.label.clone(),
-        };
         let icon = match device {
             None => "audio-x-generic-symbolic",
             Some(connect) => match connect.kind {
@@ -145,7 +140,6 @@ impl DeviceSelectorWidget {
                 ConnectDeviceKind::Other => "audio-x-generic-symbolic",
             },
         };
-        self.imp().button_content.set_label(&label);
         self.imp().button_content.set_icon_name(icon);
     }
 
