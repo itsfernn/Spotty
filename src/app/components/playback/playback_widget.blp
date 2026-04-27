@@ -83,7 +83,7 @@ template $PlaybackWidget : Box {
           halign: center;
           valign: center;
           has-frame: false;
-          icon-name: "media-playlist-queue-symbolic";
+          icon-name: "view-list-bullet-symbolic";
           tooltip-text: _("Queue");
         }
       };
@@ -98,7 +98,7 @@ template $PlaybackWidget : Box {
           name: 'slider';
           child: Box {
             Image {
-              icon-name: 'multimedia-volume-control-symbolic';
+              icon-name: 'audio-volume-high-symbolic';
             }
 
             Scale volume_slider {
@@ -129,7 +129,7 @@ template $PlaybackWidget : Box {
             valign: center;
             margin-end: 10;
             MenuButton {
-              icon-name: 'multimedia-volume-control-symbolic';
+              icon-name: 'audio-volume-high-symbolic';
               halign: end;
               styles [
                 "flat"

@@ -232,8 +232,13 @@ impl ConnectPlayer {
         let device_lost = match command {
             ConnectCommand::SetDevice(new_device_id) => {
                 let _old_id = self.device_id.write().ok()?.take();
-                let is_playing = self.api.player_state().await.map(|s| s.is_playing).unwrap_or(false);
+                let state = self.api.player_state().await;
+                let is_playing = state.as_ref().ok().map(|s| s.is_playing).unwrap_or(false);
+                let progress = state.as_ref().ok().map(|s| s.progress_ms as usize);
                 let _ = self.api.transfer_playback(new_device_id.clone(), is_playing).await;
+                if let Some(progress) = progress {
+                    let _ = self.api.player_seek(new_device_id.clone(), progress).await;
+                }
                 self.device_id.write().ok()?.replace(new_device_id);
                 self.sync_state().await;
                 false
