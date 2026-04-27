@@ -316,7 +316,7 @@ pub struct Devices {
 
 #[derive(Deserialize, Debug, Clone)]
 pub struct PlayerQueue {
-    pub currently_playing: TrackItem,
+    pub currently_playing: Option<TrackItem>,
     pub queue: Vec<TrackItem>,
 }
 
@@ -447,7 +447,9 @@ impl From<PlayerQueue> for Vec<SongDescription> {
         }: PlayerQueue,
     ) -> Self {
         let mut ids = HashSet::<String>::new();
-        queue.insert(0, currently_playing);
+        if let Some(track) = currently_playing {
+            queue.insert(0, track);
+        }
         let queue: Vec<TrackItem> = queue
             .into_iter()
             .take_while(|e| {

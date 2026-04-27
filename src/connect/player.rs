@@ -112,14 +112,19 @@ impl ConnectPlayer {
 
     pub async fn sync_state(&self) {
         debug!("polling connect device...");
-        let player_state = self.api.player_state().await;
-        let Ok(state) = player_state else {
-            self.device_lost();
-            return;
-        };
-        self.apply_remote_state(&state).await;
-        if let Ok(mut last_state) = self.last_state.write() {
-            *last_state = state;
+        match self.api.player_state().await {
+            Ok(state) => {
+                self.apply_remote_state(&state).await;
+                if let Ok(mut last_state) = self.last_state.write() {
+                    *last_state = state;
+                }
+            }
+            Err(SpotifyApiError::BadStatus(404, _)) => {
+                self.device_lost();
+            }
+            Err(e) => {
+                debug!("Failed to sync state: {e}");
+            }
         }
     }
 
