@@ -58,6 +58,7 @@ mod imp {
             popover.set_menu_model(Some(&*self.menu));
             popover.add_child(&*self.custom_content, "custom_content");
             popover.set_parent(&*self.obj());
+            popover.set_position(gtk::PositionType::Top);
             popover.set_autohide(true);
 
             self.obj()
