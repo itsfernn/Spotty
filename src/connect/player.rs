@@ -120,7 +120,7 @@ impl ConnectPlayer {
                 }
             }
             Err(SpotifyApiError::BadStatus(404, _)) => {
-                self.device_lost();
+                debug!("Device not ready yet (404), will retry on next poll");
             }
             Err(e) => {
                 debug!("Failed to sync state: {e}");
@@ -240,7 +240,6 @@ impl ConnectPlayer {
                     let _ = self.api.player_seek(new_device_id.clone(), progress).await;
                 }
                 self.device_id.write().ok()?.replace(new_device_id);
-                self.sync_state().await;
                 false
             }
             ConnectCommand::PlayerStop => {
@@ -256,7 +255,7 @@ impl ConnectPlayer {
                     let result = self.handle_other_command(device_id, command).await;
                     matches!(result, Err(SpotifyApiError::BadStatus(404, _)))
                 } else {
-                    true
+                    false
                 }
             }
         };
