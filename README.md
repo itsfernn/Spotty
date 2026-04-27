@@ -1,5 +1,11 @@
-<h1 align="center"> Spotty </h1>
-<h4 align="center"> A libadwaita/GTK4-based Spotify client </h4>
+<div align="center">
+    <img src="data/hicolor/scalable/apps/Spotty.svg" alt="Spotty Logo" width="100" />
+    <h1 align="center"> Spotty </h1>
+    <h4 align="center"> A libadwaita/GTK4-based Spotify client </h4>
+ </div>
+
+
+
 
 <!-- TODO: Add showcase screenshot -->
 
@@ -9,6 +15,8 @@ Spotty is a fork of [Riff](https://github.com/Diegovsky/riff) (which itself was 
 
 > [!NOTE]
 > **Spotty requires a premium Spotify account and a Spotify Connect daemon (e.g. spotifyd) running!**
+
+![](data/appstream/scheme-dark.png)
 
 ## Installing
 
