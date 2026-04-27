@@ -18,6 +18,8 @@ mod imp {
     #[derive(Debug, Default, CompositeTemplate)]
     #[template(resource = "/dev/diegovsky/Riff/components/song.ui")]
     pub struct SongWidget {
+        pub has_right_click: std::cell::Cell<bool>,
+
         #[template_child]
         pub song_index: TemplateChild<gtk::Label>,
 
@@ -41,6 +43,9 @@ mod imp {
 
         #[template_child]
         pub song_cover: TemplateChild<gtk::Image>,
+
+        #[template_child]
+        pub remove_btn: TemplateChild<gtk::Button>,
     }
 
     #[glib::object_subclass]
@@ -137,11 +142,53 @@ impl SongWidget {
     }
 
     pub fn set_menu(&self, menu: Option<&MenuModel>) {
-        if menu.is_some() {
-            let widget = self.imp();
-            widget.menu_btn.set_menu_model(menu);
+        let widget = self.imp();
+        if let Some(menu) = menu {
+            widget.menu_btn.set_menu_model(Some(menu));
             widget.menu_btn.add_css_class("song__menu--enabled");
         }
+    }
+
+    pub fn configure_queue_mode(&self, is_queue: bool) {
+        let widget = self.imp();
+        if is_queue {
+            widget.menu_btn.set_visible(false);
+            widget.remove_btn.set_visible(true);
+            widget.remove_btn.set_action_name(Some("song.dequeue"));
+            self.add_css_class("song--queue");
+            self.ensure_right_click_gesture();
+        } else {
+            widget.menu_btn.set_visible(true);
+            widget.remove_btn.set_visible(false);
+            widget.remove_btn.set_action_name(None::<&str>);
+            self.remove_css_class("song--queue");
+        }
+    }
+
+    fn ensure_right_click_gesture(&self) {
+        let widget = self.imp();
+        if widget.has_right_click.get() {
+            return;
+        }
+        widget.has_right_click.set(true);
+
+        let gesture = gtk::GestureClick::new();
+        gesture.set_button(3);
+        gesture.connect_pressed(clone!(
+            #[weak(rename_to = song)]
+            self,
+            move |_gesture, _n_press, x, y| {
+                let menu_btn = &song.imp().menu_btn;
+                if let Some(menu_model) = menu_btn.menu_model() {
+                    let popover = gtk::PopoverMenu::from_model(Some(&menu_model));
+                    popover.set_parent(&song);
+                    let rect = gdk::Rectangle::new(x as i32, y as i32, 1, 1);
+                    popover.set_pointing_to(Some(&rect));
+                    popover.popup();
+                }
+            }
+        ));
+        self.add_controller(gesture);
     }
 
     fn set_show_cover(&self, show_cover: bool) {

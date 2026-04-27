@@ -184,3 +184,16 @@ row:hover .song__menu--enabled, .song__menu--enabled:checked {
   margin-bottom: 12px;
   border-radius: 12px 12px 12px 12px;
 }
+
+/* Remove button in queue mode */
+.song__remove {
+  opacity: 0;
+}
+
+row:hover .song__remove {
+  opacity: 0.6;
+}
+
+.song__remove:hover {
+  opacity: 1;
+}

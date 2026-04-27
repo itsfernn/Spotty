@@ -81,6 +81,15 @@ impl PlaylistModel for NowPlayingModel {
         self.queue().current_song_id()
     }
 
+    fn is_queue(&self) -> bool {
+        true
+    }
+
+    fn remove_song(&self, id: &str) {
+        self.dispatcher
+            .dispatch(PlaybackAction::Dequeue(id.to_string()).into());
+    }
+
     fn play_song_at(&self, _pos: usize, id: &str) {
         self.dispatcher
             .dispatch(PlaybackAction::Load(id.to_string()).into());

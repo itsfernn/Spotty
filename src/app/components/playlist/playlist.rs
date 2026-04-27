@@ -33,6 +33,12 @@ pub trait PlaylistModel {
         None
     }
 
+    fn is_queue(&self) -> bool {
+        false
+    }
+
+    fn remove_song(&self, _id: &str) {}
+
     fn select_song(&self, _id: &str) {}
     fn deselect_song(&self, _id: &str) {}
     fn enable_selection(&self) -> bool {
@@ -116,6 +122,8 @@ where
                 let id = &song_model.get_id();
                 widget.set_actions(model.actions_for(id).as_ref());
                 widget.set_menu(model.menu_for(id).as_ref());
+
+                widget.configure_queue_mode(model.is_queue());
             }
         ));
 

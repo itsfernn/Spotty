@@ -137,6 +137,29 @@ template $SongWidget : Grid {
     ]
   }
 
+  Button remove_btn {
+    focus-on-click: false;
+    icon-name: "window-close-symbolic";
+    has-frame: false;
+    hexpand: false;
+    halign: end;
+    valign: center;
+    tooltip-text: "Remove from queue";
+    visible: false;
+
+    layout {
+      row-span: "2";
+      column: "4";
+      row: "0";
+    }
+
+    styles [
+      "circular",
+      "flat",
+      "song__remove",
+    ]
+  }
+
   styles [
     "song",
   ]
