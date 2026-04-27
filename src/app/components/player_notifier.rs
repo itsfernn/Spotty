@@ -190,7 +190,8 @@ impl PlayerNotifier {
                     rt.block_on(async {
                         match api.list_available_devices().await {
                             Ok(devices) => {
-                                if let Some(device) = devices.first() {
+                                // Select device tagged as active
+                                if let Some(device) = devices.iter().find(|d| d.is_active) {
                                     sender
                                         .unbounded_send(
                                             PlaybackAction::SwitchDevice(Some(device.clone())).into(),

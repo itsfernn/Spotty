@@ -649,7 +649,7 @@ impl From<Playlist> for PlaylistDescription {
 impl From<Device> for ConnectDevice {
     fn from(
         Device {
-            id, name, type_, ..
+            id, name, type_, is_active, ..
         }: Device,
     ) -> Self {
         let kind = match type_.to_lowercase().as_str() {
@@ -662,6 +662,7 @@ impl From<Device> for ConnectDevice {
             id,
             label: name,
             kind,
+            is_active,
         }
     }
 }

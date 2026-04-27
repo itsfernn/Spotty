@@ -130,6 +130,7 @@ pub struct ConnectDevice {
     pub id: String,
     pub label: String,
     pub kind: ConnectDeviceKind,
+    pub is_active: bool,
 }
 
 #[derive(Clone, Debug)]
