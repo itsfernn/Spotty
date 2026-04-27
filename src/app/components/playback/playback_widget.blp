@@ -49,68 +49,41 @@ template $PlaybackWidget : Box {
     height-request: 1;
 
     Adw.Breakpoint {
-      condition("max-width:700sp")
-
-      setters {
-        desktop-grid.column-homogeneous: false;
-        controls.halign: end;
-      }
-    }
-
-    Adw.Breakpoint {
       condition("max-width:600sp")
 
       setters {
         volume-stack.visible-child-name: 'slider-button';
-        desktop-grid.column-homogeneous: false;
-        controls.halign: end;
       }
     }
 
-    child: Grid desktop-grid  {
-      column-homogeneous: false;
-      halign: fill;
+    child: Box {
+      orientation: horizontal;
       hexpand: true;
 
       $PlaybackInfoWidget now_playing {
-        halign: "start";
-        valign: "center";
-
-        layout {
-          column-span: "1";
-          column: "0";
-          row: "0";
-        }
-      }
-
-      $DeviceSelectorWidget device_selector {
-        layout {
-          column-span: "1";
-          column: "1";
-          row: "0";
-        }
-      }
-
-      $PlaybackControlsWidget controls {
-        halign: center;
         hexpand: true;
-        layout {
-          column-span: "1";
-          column: "2";
-          row: "0";
-        }
+        halign: start;
+        valign: center;
       }
 
+      Box {
+        halign: center;
+        valign: center;
+        spacing: 4;
+
+        $DeviceSelectorWidget device_selector {
+        }
+
+        $PlaybackControlsWidget controls {
+          halign: center;
+        }
+      }
 
       Stack volume-stack {
         visible-child-name: "slider";
-        hexpand: false;
-
-        layout {
-          column-span: "1";
-          column: "3";
-          row: "0";
-        }
+        hexpand: true;
+        halign: end;
+        valign: center;
 
         StackPage {
           name: 'slider';
@@ -124,11 +97,6 @@ template $PlaybackWidget : Box {
               show-fill-level: true;
               restrict-to-fill-level: false;
               value-pos: left;
-              layout {
-                column-span: "1";
-                column: 2;
-                row: "0";
-              }
 
               styles [
                 'volume-slider'
