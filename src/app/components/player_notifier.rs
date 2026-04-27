@@ -1,17 +1,13 @@
-use std::ops::Deref;
 use std::rc::Rc;
 
 use futures::channel::mpsc::UnboundedSender;
-use librespot::core::spotify_id::SpotifyId;
-use librespot::core::SpotifyUri;
 
+use crate::api::{oauth2::RiffOauthClient, TokenStore};
 use crate::app::components::EventListener;
-use crate::app::state::{
-    Device, LoginAction, LoginEvent, LoginStartedEvent, PlaybackEvent, SettingsEvent,
-};
+use crate::app::models::ConnectDevice;
+use crate::app::state::{LoginAction, LoginEvent, LoginStartedEvent, PlaybackEvent};
 use crate::app::{ActionDispatcher, AppAction, AppEvent, AppModel, SongsSource};
 use crate::connect::ConnectCommand;
-use crate::player::Command;
 
 enum CurrentlyPlaying {
     WithSource {
@@ -37,22 +33,25 @@ impl CurrentlyPlaying {
 pub struct PlayerNotifier {
     app_model: Rc<AppModel>,
     dispatcher: Box<dyn ActionDispatcher>,
-    command_sender: UnboundedSender<Command>,
+    sender: UnboundedSender<AppAction>,
     connect_command_sender: UnboundedSender<ConnectCommand>,
+    token_store: TokenStore,
 }
 
 impl PlayerNotifier {
     pub fn new(
         app_model: Rc<AppModel>,
         dispatcher: Box<dyn ActionDispatcher>,
-        command_sender: UnboundedSender<Command>,
+        sender: UnboundedSender<AppAction>,
         connect_command_sender: UnboundedSender<ConnectCommand>,
+        token_store: TokenStore,
     ) -> Self {
         Self {
             app_model,
             dispatcher,
-            command_sender,
+            sender,
             connect_command_sender,
+            token_store,
         }
     }
 
@@ -79,25 +78,111 @@ impl PlayerNotifier {
         Some(result)
     }
 
-    fn device(&self) -> impl Deref<Target = Device> + '_ {
-        self.app_model.map_state(|s| s.playback.current_device())
-    }
-
     fn notify_login(&self, event: &LoginEvent) {
-        info!("notify_login: {:?}", event);
-        let command = match event {
-            LoginEvent::LoginStarted(LoginStartedEvent::Restore) => Some(Command::Restore),
-            LoginEvent::LoginStarted(LoginStartedEvent::InitLogin) => Some(Command::InitLogin),
-            LoginEvent::LoginStarted(LoginStartedEvent::CompleteLogin) => {
-                Some(Command::CompleteLogin)
+        match event {
+            LoginEvent::LoginStarted(LoginStartedEvent::InitLogin) => {
+                let sender = self.sender.clone();
+                let token_store = self.token_store.clone();
+                std::thread::spawn(move || {
+                    let rt = tokio::runtime::Runtime::new().expect("Failed to create tokio runtime");
+                    rt.block_on(async {
+                        let oauth = RiffOauthClient::new(token_store);
+                        match oauth.spawn_authcode_listener(|| {}).await {
+                            Ok(challenge) => {
+                                sender
+                                    .unbounded_send(
+                                        LoginAction::OpenLoginUrl(challenge.auth_url.clone())
+                                            .into(),
+                                    )
+                                    .unwrap();
+                                match oauth.exchange_authcode(challenge).await {
+                                    Ok(_creds) => {
+                                        info!("Login successful");
+                                        sender
+                                            .unbounded_send(
+                                                LoginAction::SetLoginSuccess(String::new()).into(),
+                                            )
+                                            .unwrap();
+                                    }
+                                    Err(e) => {
+                                        error!("OAuth exchange failed: {}", e);
+                                        sender
+                                            .unbounded_send(LoginAction::SetLoginFailure.into())
+                                            .unwrap();
+                                    }
+                                }
+                            }
+                            Err(e) => {
+                                error!("OAuth init failed: {}", e);
+                                sender
+                                    .unbounded_send(LoginAction::SetLoginFailure.into())
+                                    .unwrap();
+                            }
+                        }
+                    });
+                });
             }
-            LoginEvent::FreshTokenRequested => Some(Command::RefreshToken),
-            LoginEvent::LogoutCompleted => Some(Command::Logout),
-            _ => None,
-        };
-
-        if let Some(command) = command {
-            self.send_command_to_local_player(command);
+            LoginEvent::LoginStarted(LoginStartedEvent::CompleteLogin) => {
+                error!("CompleteLogin event received but no pending login");
+            }
+            LoginEvent::LoginStarted(LoginStartedEvent::Restore) => {
+                let sender = self.sender.clone();
+                let token_store = self.token_store.clone();
+                std::thread::spawn(move || {
+                    let rt = tokio::runtime::Runtime::new().expect("Failed to create tokio runtime");
+                    rt.block_on(async {
+                        let oauth = RiffOauthClient::new(token_store);
+                        match oauth.get_valid_token().await {
+                            Ok(_creds) => {
+                                info!("Restored session");
+                                sender
+                                    .unbounded_send(
+                                        LoginAction::SetLoginSuccess(String::new()).into(),
+                                    )
+                                    .unwrap();
+                            }
+                            Err(_) => {
+                                debug!("No saved session to restore");
+                                sender
+                                    .unbounded_send(LoginAction::ShowLogin.into())
+                                    .unwrap();
+                            }
+                        }
+                    });
+                });
+            }
+            LoginEvent::FreshTokenRequested => {
+                let sender = self.sender.clone();
+                let token_store = self.token_store.clone();
+                std::thread::spawn(move || {
+                    let rt = tokio::runtime::Runtime::new().expect("Failed to create tokio runtime");
+                    rt.block_on(async {
+                        let oauth = RiffOauthClient::new(token_store);
+                        match oauth.refresh_token_at_expiry().await {
+                            Ok(_) => {
+                                sender
+                                    .unbounded_send(LoginAction::TokenRefreshed.into())
+                                    .unwrap();
+                            }
+                            Err(_) => {
+                                sender
+                                    .unbounded_send(LoginAction::SetLoginFailure.into())
+                                    .unwrap();
+                            }
+                        }
+                    });
+                });
+            }
+            LoginEvent::LogoutCompleted => {
+                let token_store = self.token_store.clone();
+                std::thread::spawn(move || {
+                    let rt = tokio::runtime::Runtime::new().expect("Failed to create tokio runtime");
+                    rt.block_on(async {
+                        token_store.clear().await;
+                    });
+                });
+            }
+            _ => {}
         }
     }
 
@@ -138,44 +223,19 @@ impl PlayerNotifier {
         };
 
         if let Some(command) = command {
-            self.send_command_to_connect_player(command);
+            self.connect_command_sender.unbounded_send(command).unwrap();
         }
     }
 
-    fn notify_local_player(&self, event: &PlaybackEvent) {
-        let command = match event {
-            PlaybackEvent::PlaybackPaused => Some(Command::PlayerPause),
-            PlaybackEvent::PlaybackResumed => Some(Command::PlayerResume),
-            PlaybackEvent::PlaybackStopped => Some(Command::PlayerStop),
-            PlaybackEvent::VolumeSet(volume) => Some(Command::PlayerSetVolume(*volume)),
-            PlaybackEvent::TrackChanged(id) => {
-                info!("track changed: {}", id);
-                SpotifyId::from_base62(id)
-                    .ok()
-                    .map(|track| Command::PlayerLoad {
-                        track: SpotifyUri::Track { id: track },
-                        resume: true,
-                    })
+    fn switch_device(&mut self, device: &Option<ConnectDevice>) {
+        match device {
+            Some(device) => {
+                self.send_command_to_connect_player(ConnectCommand::SetDevice(device.id.clone()));
+                self.notify_connect_player(&PlaybackEvent::SourceChanged);
             }
-            PlaybackEvent::SourceChanged => {
-                let resume = self.is_playing();
-                self.currently_playing()
-                    .and_then(|c| SpotifyId::from_base62(c.song_id()).ok())
-                    .map(|track| Command::PlayerLoad {
-                        track: SpotifyUri::Track { id: track },
-                        resume,
-                    })
+            None => {
+                self.send_command_to_connect_player(ConnectCommand::PlayerStop);
             }
-            PlaybackEvent::TrackSeeked(position) => Some(Command::PlayerSeek(*position)),
-            PlaybackEvent::Preload(id) => SpotifyId::from_base62(id)
-                .ok()
-                .map(|track| SpotifyUri::Track { id: track })
-                .map(Command::PlayerPreload),
-            _ => None,
-        };
-
-        if let Some(command) = command {
-            self.send_command_to_local_player(command);
         }
     }
 
@@ -183,43 +243,14 @@ impl PlayerNotifier {
         self.connect_command_sender.unbounded_send(command).unwrap();
     }
 
-    fn send_command_to_local_player(&self, command: Command) {
-        let dispatcher = &self.dispatcher;
-        self.command_sender
-            .unbounded_send(command)
-            .unwrap_or_else(|_| {
-                dispatcher.dispatch(AppAction::LoginAction(LoginAction::SetLoginFailure));
-            });
-    }
-
-    fn switch_device(&mut self, device: &Device) {
-        match device {
-            Device::Connect(device) => {
-                self.send_command_to_local_player(Command::PlayerStop);
-                self.send_command_to_connect_player(ConnectCommand::SetDevice(device.id.clone()));
-                self.notify_connect_player(&PlaybackEvent::SourceChanged);
-            }
-            Device::Local => {
-                self.send_command_to_connect_player(ConnectCommand::PlayerStop);
-                self.notify_local_player(&PlaybackEvent::SourceChanged);
-            }
-        }
-    }
 }
 
 impl EventListener for PlayerNotifier {
     fn on_event(&mut self, event: &AppEvent) {
-        let device = self.device().clone();
-        match (device, event) {
-            (_, AppEvent::LoginEvent(event)) => self.notify_login(event),
-            (_, AppEvent::PlaybackEvent(PlaybackEvent::SwitchedDevice(d))) => self.switch_device(d),
-            (Device::Local, AppEvent::PlaybackEvent(event)) => self.notify_local_player(event),
-            (Device::Local, AppEvent::SettingsEvent(SettingsEvent::PlayerSettingsChanged)) => {
-                self.send_command_to_local_player(Command::ReloadSettings)
-            }
-            (Device::Connect(_), AppEvent::PlaybackEvent(event)) => {
-                self.notify_connect_player(event)
-            }
+        match event {
+            AppEvent::LoginEvent(event) => self.notify_login(event),
+            AppEvent::PlaybackEvent(PlaybackEvent::SwitchedDevice(d)) => self.switch_device(d),
+            AppEvent::PlaybackEvent(event) => self.notify_connect_player(event),
             _ => {}
         }
     }

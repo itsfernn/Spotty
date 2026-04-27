@@ -1,5 +1,6 @@
+use crate::api::{CachedSpotifyClient, TokenStore};
+use crate::connect::ConnectCommand;
 use crate::settings::{RiffSettings, StateTracker};
-use crate::{api::CachedSpotifyClient, player::TokenStore};
 use futures::channel::mpsc::UnboundedSender;
 use std::rc::Rc;
 use std::sync::Arc;
@@ -57,9 +58,9 @@ impl App {
         let components: Vec<Box<dyn EventListener>> = vec![
             App::make_player_notifier(
                 Rc::clone(&model),
-                &settings,
                 Box::new(ActionDispatcherImpl::new(sender.clone(), worker.clone())),
                 sender.clone(),
+                crate::connect::start_connect_server(model.get_spotify(), sender.clone()),
                 token_store,
             ),
             Box::new(StateTracker::new_from_gsettings()),
@@ -91,7 +92,7 @@ impl App {
 
         // Send gsettings updates for saved settings like repeat mode, shuffle, etc.
         // has to be done after the UI loads, otherwise visual glitches occour.
-        for action in self.settings.player_settings.actions() {
+        for action in self.settings.actions() {
             sender.unbounded_send(action).unwrap();
         }
 
@@ -123,23 +124,17 @@ impl App {
     // A component that listens to what's happening in the app, and translates it for the actual player
     fn make_player_notifier(
         app_model: Rc<AppModel>,
-        settings: &RiffSettings,
         dispatcher: Box<dyn ActionDispatcher>,
         sender: UnboundedSender<AppAction>,
+        connect_command_sender: UnboundedSender<ConnectCommand>,
         token_store: TokenStore,
     ) -> Box<impl EventListener> {
-        let api = app_model.get_spotify();
         Box::new(PlayerNotifier::new(
             app_model,
             dispatcher,
-            // Either communications with the librespot player
-            crate::player::start_player_service(
-                settings.player_settings.clone(),
-                sender.clone(),
-                token_store,
-            ),
-            // or with a Spotify Connect device
-            crate::connect::start_connect_server(api, sender),
+            sender,
+            connect_command_sender,
+            token_store,
         ))
     }
 

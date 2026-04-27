@@ -1,15 +1,11 @@
-use crate::{
-    app::{
-        components::EventListener,
-        models::RepeatMode,
-        state::{PlaybackAction, PlaybackEvent},
-        AppAction, AppEvent,
-    },
-    player::{AudioBackend, SpotifyPlayerSettings},
+use crate::app::{
+    components::EventListener,
+    models::RepeatMode,
+    state::{PlaybackAction, PlaybackEvent},
+    AppAction, AppEvent,
 };
 use gio::prelude::SettingsExt;
 use libadwaita::ColorScheme;
-use librespot::playback::config::Bitrate;
 
 const SETTINGS: &str = "dev.diegovsky.Riff";
 
@@ -43,40 +39,17 @@ impl WindowGeometry {
     }
 }
 
-// Player (librespot) settings
-impl SpotifyPlayerSettings {
-    fn new_from_gsettings(settings: &gio::Settings) -> Option<Self> {
-        let bitrate = match settings.enum_("player-bitrate") {
-            0 => Some(Bitrate::Bitrate96),
-            1 => Some(Bitrate::Bitrate160),
-            2 => Some(Bitrate::Bitrate320),
-            _ => None,
-        }?;
-        let backend = match settings.enum_("audio-backend") {
-            0 => Some(AudioBackend::PulseAudio),
-            1 => Some(AudioBackend::Alsa(
-                settings.string("alsa-device").as_str().to_string(),
-            )),
-            2 => Some(AudioBackend::GStreamer(
-                "audioconvert dithering=none ! audioresample ! pipewiresink".to_string(), // This should be configurable eventually
-            )),
-            _ => None,
-        }?;
-        let gapless = settings.boolean("gapless-playback");
+#[derive(Debug, Clone)]
+pub struct RiffSettings {
+    pub theme_preference: ColorScheme,
+    pub volume: f64,
+    pub shuffle: bool,
+    pub repeat: RepeatMode,
+    pub window: WindowGeometry,
+}
 
-        let ap_port_val = settings.uint("ap-port");
-        if ap_port_val > 65535 {
-            panic!("Invalid access point port");
-        }
-
-        // Access points usually use port 80, 443 or 4070. Since gsettings
-        // does not allow optional values, we use 0 to indicate that any
-        // port is OK and we should pass None to librespot's ap-port.
-        let ap_port = match ap_port_val {
-            0 => None,
-            x => Some(x as u16),
-        };
-
+impl RiffSettings {
+    fn load_player_settings(settings: &gio::Settings) -> (f64, bool, RepeatMode) {
         let volume = settings.double("volume");
         let shuffle = settings.boolean("shuffle");
         let repeat = match settings.string("repeat").as_str() {
@@ -84,18 +57,9 @@ impl SpotifyPlayerSettings {
             "playlist" => RepeatMode::Playlist,
             "none" | _ => RepeatMode::None,
         };
-
-        Some(Self {
-            volume,
-            repeat,
-            shuffle,
-
-            bitrate,
-            backend,
-            gapless,
-            ap_port,
-        })
+        (volume, shuffle, repeat)
     }
+
     pub fn actions(&self) -> Vec<AppAction> {
         use PlaybackAction::*;
         vec![
@@ -104,13 +68,6 @@ impl SpotifyPlayerSettings {
             SetRepeatMode(self.repeat).into(),
         ]
     }
-}
-
-#[derive(Debug, Clone)]
-pub struct RiffSettings {
-    pub theme_preference: ColorScheme,
-    pub player_settings: SpotifyPlayerSettings,
-    pub window: WindowGeometry,
 }
 
 // Application settings
@@ -123,9 +80,12 @@ impl RiffSettings {
             2 => Some(ColorScheme::Default),
             _ => None,
         }?;
+        let (volume, shuffle, repeat) = Self::load_player_settings(&settings);
         Some(Self {
             theme_preference,
-            player_settings: SpotifyPlayerSettings::new_from_gsettings(&settings)?,
+            volume,
+            shuffle,
+            repeat,
             window: WindowGeometry::new_from_gsettings(),
         })
     }
@@ -135,7 +95,9 @@ impl Default for RiffSettings {
     fn default() -> Self {
         Self {
             theme_preference: ColorScheme::PreferDark,
-            player_settings: Default::default(),
+            volume: 0.7,
+            shuffle: false,
+            repeat: RepeatMode::None,
             window: Default::default(),
         }
     }

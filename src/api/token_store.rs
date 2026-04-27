@@ -1,6 +1,6 @@
 use anyhow::{Context, Result};
 use oo7::Keyring;
-use std::sync::{Arc, OnceLock, RwLock, RwLockReadGuard};
+use std::sync::{Arc, RwLock};
 
 use crate::app::credentials::Credentials;
 

@@ -5,7 +5,7 @@ use gtk::prelude::Cast;
 
 use crate::app::components::{Component, EventListener};
 use crate::app::models::ConnectDevice;
-use crate::app::state::{Device, LoginEvent, PlaybackAction, PlaybackEvent};
+use crate::app::state::{LoginEvent, PlaybackAction, PlaybackEvent};
 use crate::app::{ActionDispatcher, AppEvent, AppModel};
 
 use super::widget::DeviceSelectorWidget;
@@ -38,16 +38,15 @@ impl DeviceSelectorModel {
         self.app_model.map_state(|s| s.playback.available_devices())
     }
 
-    pub fn get_current_device(&self) -> impl Deref<Target = Device> + '_ {
+    pub fn get_current_device(&self) -> impl Deref<Target = Option<ConnectDevice>> + '_ {
         self.app_model.map_state(|s| s.playback.current_device())
     }
 
     pub fn set_current_device(&self, id: Option<String>) {
         let devices = self.get_available_devices();
-        let connect_device = id
+        let device = id
             .and_then(|id| devices.iter().find(|&d| d.id == id))
             .cloned();
-        let device = connect_device.map(Device::Connect).unwrap_or(Device::Local);
         self.dispatcher
             .dispatch(PlaybackAction::SwitchDevice(device).into());
     }

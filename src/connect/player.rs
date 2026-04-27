@@ -7,7 +7,7 @@ use gettextrs::gettext;
 
 use crate::api::{SpotifyApiClient, SpotifyApiError, SpotifyResult};
 use crate::app::models::{ConnectPlayerState, RepeatMode, SongDescription};
-use crate::app::state::{Device, PlaybackAction};
+use crate::app::state::PlaybackAction;
 use crate::app::{AppAction, SongsSource};
 
 #[derive(Debug)]
@@ -63,7 +63,7 @@ impl ConnectPlayer {
         let _ = self.device_id.write().unwrap().take();
         self.send_actions([
             AppAction::ShowNotification(gettext("Connection to device lost!")),
-            PlaybackAction::SwitchDevice(Device::Local).into(),
+            PlaybackAction::SwitchDevice(None).into(),
             PlaybackAction::SetAvailableDevices(vec![]).into(),
         ]);
     }

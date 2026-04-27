@@ -5,12 +5,11 @@ use serde::de::DeserializeOwned;
 use serde_json::from_slice;
 use std::convert::Into;
 use std::future::Future;
-use std::sync::Arc;
 
 use super::cache::{CacheExpiry, CacheManager, CachePolicy, FetchResult};
 use super::client::*;
 use crate::app::models::*;
-use crate::player::TokenStore;
+use crate::api::TokenStore;
 
 pub type SpotifyResult<T> = Result<T, SpotifyApiError>;
 

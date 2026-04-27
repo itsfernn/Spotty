@@ -20,7 +20,7 @@ mod app;
 mod config;
 mod connect;
 mod dbus;
-mod player;
+
 mod settings;
 
 use crate::app::components::expose_custom_widgets;

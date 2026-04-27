@@ -22,14 +22,13 @@ use oauth2::{PkceCodeVerifier, RefreshToken, RequestTokenError};
 use std::collections::HashMap;
 use std::io;
 use std::net::SocketAddr;
-use std::sync::Arc;
 use std::time::{Duration, SystemTime};
 use thiserror::Error;
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::task::JoinHandle;
 use url::Url;
 
-use super::TokenStore;
+use crate::api::TokenStore;
 
 pub const CLIENT_ID: &str = "782ae96ea60f4cdf986a766049607005";
 pub const REDIRECT_URI: &str = "http://127.0.0.1:8898/login";

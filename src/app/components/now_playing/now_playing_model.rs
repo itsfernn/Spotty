@@ -8,7 +8,6 @@ use crate::app::components::{
     SimpleHeaderBarModelWrapper,
 };
 use crate::app::models::{SongDescription, SongListModel};
-use crate::app::state::Device;
 use crate::app::state::{
     PlaybackAction, PlaybackState, SelectionAction, SelectionContext, SelectionState,
 };
@@ -63,8 +62,8 @@ impl NowPlayingModel {
     fn current_selection_context(&self) -> SelectionContext {
         let state = self.app_model.get_state();
         match state.playback.current_device() {
-            Device::Local => SelectionContext::Queue,
-            Device::Connect(_) => SelectionContext::ReadOnlyQueue,
+            None => SelectionContext::Queue,
+            Some(_) => SelectionContext::ReadOnlyQueue,
         }
     }
 }

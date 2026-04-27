@@ -129,18 +129,18 @@ impl DeviceSelectorWidget {
     pub fn set_current_device(&self, device: &Device) {
         if let Some(action) = self.action(CONNECT_ACTION) {
             let device_id = match device {
-                Device::Local => None,
-                Device::Connect(connect) => Some(&connect.id),
+                None => None,
+                Some(connect) => Some(&connect.id),
             };
             action.change_state(&device_id.to_variant());
         }
         let label = match device {
-            Device::Local => gettext("This device"),
-            Device::Connect(connect) => connect.label.clone(),
+            None => gettext("No device"),
+            Some(connect) => connect.label.clone(),
         };
         let icon = match device {
-            Device::Local => "audio-x-generic-symbolic",
-            Device::Connect(connect) => match connect.kind {
+            None => "audio-x-generic-symbolic",
+            Some(connect) => match connect.kind {
                 ConnectDeviceKind::Phone => "phone-symbolic",
                 ConnectDeviceKind::Computer => "computer-symbolic",
                 ConnectDeviceKind::Speaker => "audio-speakers-symbolic",

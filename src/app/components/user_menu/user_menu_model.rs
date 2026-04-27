@@ -1,5 +1,4 @@
 use crate::api::clear_user_cache;
-use crate::app::credentials::Credentials;
 use crate::app::state::{LoginAction, PlaybackAction};
 use crate::app::{ActionDispatcher, AppModel};
 use std::ops::Deref;

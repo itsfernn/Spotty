@@ -1,7 +1,9 @@
 use std::borrow::Cow;
 use std::time::Instant;
 
-use crate::app::models::*;
+use crate::app::models::{
+    ConnectDevice, RepeatMode, SongBatch, SongDescription, SongListModel, SongListModelPending,
+};
 use crate::app::state::{AppAction, AppEvent, UpdatableState};
 use crate::app::{BatchQuery, LazyRandomIndex, SongsSource};
 
@@ -257,7 +259,7 @@ impl PlaybackState {
         &self.available_devices
     }
 
-    pub fn current_device(&self) -> &Device {
+    pub fn current_device(&self) -> &Option<ConnectDevice> {
         &self.current_device
     }
 }
@@ -266,7 +268,7 @@ impl Default for PlaybackState {
     fn default() -> Self {
         Self {
             available_devices: vec![],
-            current_device: Device::Local,
+            current_device: None,
             index: LazyRandomIndex::default(),
             songs: SongListModel::new(50),
             list_position: None,
@@ -301,7 +303,7 @@ pub enum PlaybackAction {
     Preload,
     Queue(Vec<SongDescription>),
     Dequeue(String),
-    SwitchDevice(Device),
+    SwitchDevice(Option<ConnectDevice>),
     SetAvailableDevices(Vec<ConnectDevice>),
 }
 
@@ -311,11 +313,7 @@ impl From<PlaybackAction> for AppAction {
     }
 }
 
-#[derive(Clone, Debug)]
-pub enum Device {
-    Local,
-    Connect(ConnectDevice),
-}
+pub type Device = Option<ConnectDevice>;
 
 #[derive(Clone, Debug)]
 pub enum PlaybackEvent {
@@ -331,7 +329,7 @@ pub enum PlaybackEvent {
     ShuffleChanged(bool),
     PlaylistChanged,
     PlaybackStopped,
-    SwitchedDevice(Device),
+    SwitchedDevice(Option<ConnectDevice>),
     AvailableDevicesChanged,
 }
 

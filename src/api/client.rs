@@ -8,10 +8,9 @@ use serde_json::from_str;
 use std::convert::Into;
 use std::marker::PhantomData;
 use std::str::FromStr;
-use std::sync::Arc;
 use thiserror::Error;
 
-use crate::player::TokenStore;
+use crate::api::TokenStore;
 
 pub use super::api_models::*;
 use super::cache::CacheError;
