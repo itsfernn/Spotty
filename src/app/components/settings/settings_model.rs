@@ -4,6 +4,7 @@ use crate::settings::RiffSettings;
 use std::rc::Rc;
 
 pub struct SettingsModel {
+    #[allow(dead_code)]
     app_model: Rc<AppModel>,
     dispatcher: Box<dyn ActionDispatcher>,
 }
@@ -16,6 +17,7 @@ impl SettingsModel {
         }
     }
 
+    #[allow(dead_code)]
     pub fn stop_player(&self) {
         self.dispatcher.dispatch(PlaybackAction::Stop.into());
     }
@@ -25,6 +27,7 @@ impl SettingsModel {
             .dispatch(SettingsAction::ChangeSettings.into());
     }
 
+    #[allow(dead_code)]
     pub fn settings(&self) -> RiffSettings {
         let state = self.app_model.get_state();
         state.settings.settings.clone()

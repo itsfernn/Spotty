@@ -4,7 +4,7 @@ use std::rc::Rc;
 use crate::app::components::device_selector::{DeviceSelector, DeviceSelectorModel};
 use crate::app::components::EventListener;
 use crate::app::models::*;
-use crate::app::state::{LoginEvent, PlaybackAction, PlaybackEvent, ScreenName, SelectionEvent};
+use crate::app::state::{PlaybackAction, PlaybackEvent, ScreenName, SelectionEvent};
 use crate::app::{
     ActionDispatcher, AppAction, AppEvent, AppModel, AppState, BrowserAction, Worker,
 };

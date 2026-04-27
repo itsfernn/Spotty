@@ -144,6 +144,15 @@ impl DeviceSelectorWidget {
         self.imp().button_content.set_icon_name(icon);
     }
 
+    pub fn show_selector(&self) {
+        let popover = &self.imp().popover;
+        if !popover.is_visible() {
+            popover.set_visible(true);
+            popover.present();
+            popover.grab_focus();
+        }
+    }
+
     pub fn update_devices_list(&self, devices: &[ConnectDevice]) {
         let widget = self.imp();
 

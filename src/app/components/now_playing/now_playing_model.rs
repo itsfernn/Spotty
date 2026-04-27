@@ -55,6 +55,7 @@ impl NowPlayingModel {
         ))
     }
 
+    #[allow(dead_code)]
     pub fn device_selector_model(&self) -> DeviceSelectorModel {
         DeviceSelectorModel::new(self.app_model.clone(), self.dispatcher.box_clone())
     }

@@ -22,6 +22,7 @@ enum CurrentlyPlaying {
 }
 
 impl CurrentlyPlaying {
+    #[allow(dead_code)]
     fn song_id(&self) -> &String {
         match self {
             Self::WithSource { song, .. } => song,
@@ -55,6 +56,7 @@ impl PlayerNotifier {
         }
     }
 
+    #[allow(dead_code)]
     fn is_playing(&self) -> bool {
         self.app_model.get_state().playback.is_playing()
     }
@@ -252,6 +254,18 @@ impl PlayerNotifier {
         };
 
         if let Some(command) = command {
+            if self.app_model.get_state().playback.current_device().is_none()
+                && matches!(
+                    command,
+                    ConnectCommand::PlayerResume
+                        | ConnectCommand::PlayerLoadInContext { .. }
+                        | ConnectCommand::PlayerLoad { .. }
+                )
+            {
+                self.dispatcher
+                    .dispatch(PlaybackAction::ShowDeviceSelector.into());
+                return;
+            }
             self.connect_command_sender.unbounded_send(command).unwrap();
         }
     }

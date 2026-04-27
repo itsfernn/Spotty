@@ -37,6 +37,7 @@ pub trait PlaylistModel {
         false
     }
 
+    #[allow(dead_code)]
     fn remove_song(&self, _id: &str) {}
 
     fn select_song(&self, _id: &str) {}

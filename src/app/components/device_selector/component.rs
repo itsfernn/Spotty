@@ -101,6 +101,9 @@ impl EventListener for DeviceSelector {
                 self.widget
                     .set_current_device(&self.model.get_current_device());
             }
+            AppEvent::PlaybackEvent(PlaybackEvent::ShowDeviceSelector) => {
+                self.widget.show_selector();
+            }
             _ => (),
         }
     }

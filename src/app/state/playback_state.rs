@@ -305,6 +305,7 @@ pub enum PlaybackAction {
     Dequeue(String),
     SwitchDevice(Option<ConnectDevice>),
     SetAvailableDevices(Vec<ConnectDevice>),
+    ShowDeviceSelector,
 }
 
 impl From<PlaybackAction> for AppAction {
@@ -323,14 +324,15 @@ pub enum PlaybackEvent {
     TrackSeeked(u32),
     SeekSynced(u32),
     VolumeSet(f64),
-    TrackChanged(String),
+    TrackChanged(()),
     SourceChanged,
-    Preload(String),
+    Preload(()),
     ShuffleChanged(bool),
     PlaylistChanged,
     PlaybackStopped,
     SwitchedDevice(Option<ConnectDevice>),
     AvailableDevicesChanged,
+    ShowDeviceSelector,
 }
 
 impl From<PlaybackEvent> for AppEvent {
@@ -345,6 +347,18 @@ impl UpdatableState for PlaybackState {
 
     // Main "reducer" :)
     fn update_with(&mut self, action: Cow<Self::Action>) -> Vec<Self::Event> {
+        if self.current_device.is_none() {
+            match action.as_ref() {
+                PlaybackAction::TogglePlay
+                | PlaybackAction::Play
+                | PlaybackAction::Load(_)
+                | PlaybackAction::Next
+                | PlaybackAction::Previous => {
+                    return vec![PlaybackEvent::ShowDeviceSelector];
+                }
+                _ => {}
+            }
+        }
         match action.into_owned() {
             PlaybackAction::TogglePlay => {
                 if let Some(playing) = self.toggle_play() {
@@ -392,9 +406,9 @@ impl UpdatableState for PlaybackState {
                 vec![PlaybackEvent::ShuffleChanged(self.is_shuffled)]
             }
             PlaybackAction::Next => {
-                if let Some(id) = self.play_next() {
+                if self.play_next().is_some() {
                     vec![
-                        PlaybackEvent::TrackChanged(id),
+                        PlaybackEvent::TrackChanged(()),
                         PlaybackEvent::PlaybackResumed,
                     ]
                 } else {
@@ -407,9 +421,9 @@ impl UpdatableState for PlaybackState {
                 vec![PlaybackEvent::PlaybackStopped]
             }
             PlaybackAction::Previous => {
-                if let Some(id) = self.play_prev() {
+                if self.play_prev().is_some() {
                     vec![
-                        PlaybackEvent::TrackChanged(id),
+                        PlaybackEvent::TrackChanged(()),
                         PlaybackEvent::PlaybackResumed,
                     ]
                 } else {
@@ -419,7 +433,7 @@ impl UpdatableState for PlaybackState {
             PlaybackAction::Load(id) => {
                 if self.play(&id) {
                     vec![
-                        PlaybackEvent::TrackChanged(id),
+                        PlaybackEvent::TrackChanged(()),
                         PlaybackEvent::PlaybackResumed,
                     ]
                 } else {
@@ -427,8 +441,8 @@ impl UpdatableState for PlaybackState {
                 }
             }
             PlaybackAction::Preload => {
-                if let Some(id) = self.next_id() {
-                    vec![PlaybackEvent::Preload(id)]
+                if self.next_id().is_some() {
+                    vec![PlaybackEvent::Preload(())]
                 } else {
                     vec![]
                 }
@@ -480,6 +494,9 @@ impl UpdatableState for PlaybackState {
             PlaybackAction::SwitchDevice(new_device) => {
                 self.current_device = new_device.clone();
                 vec![PlaybackEvent::SwitchedDevice(new_device)]
+            }
+            PlaybackAction::ShowDeviceSelector => {
+                vec![PlaybackEvent::ShowDeviceSelector]
             }
             _ => vec![],
         }
