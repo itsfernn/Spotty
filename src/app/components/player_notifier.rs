@@ -5,7 +5,7 @@ use futures::channel::mpsc::UnboundedSender;
 use crate::api::{oauth2::RiffOauthClient, TokenStore};
 use crate::app::components::EventListener;
 use crate::app::models::ConnectDevice;
-use crate::app::state::{LoginAction, LoginEvent, LoginStartedEvent, PlaybackEvent};
+use crate::app::state::{LoginAction, LoginEvent, LoginStartedEvent, PlaybackAction, PlaybackEvent};
 use crate::app::{ActionDispatcher, AppAction, AppEvent, AppModel, SongsSource};
 use crate::connect::ConnectCommand;
 
@@ -179,6 +179,34 @@ impl PlayerNotifier {
                     let rt = tokio::runtime::Runtime::new().expect("Failed to create tokio runtime");
                     rt.block_on(async {
                         token_store.clear().await;
+                    });
+                });
+            }
+            LoginEvent::LoginCompleted => {
+                let sender = self.sender.clone();
+                let api = self.app_model.get_spotify();
+                std::thread::spawn(move || {
+                    let rt = tokio::runtime::Runtime::new().expect("Failed to create tokio runtime");
+                    rt.block_on(async {
+                        match api.list_available_devices().await {
+                            Ok(devices) => {
+                                if let Some(device) = devices.first() {
+                                    sender
+                                        .unbounded_send(
+                                            PlaybackAction::SwitchDevice(Some(device.clone())).into(),
+                                        )
+                                        .unwrap();
+                                }
+                                sender
+                                    .unbounded_send(
+                                        PlaybackAction::SetAvailableDevices(devices).into(),
+                                    )
+                                    .unwrap();
+                            }
+                            Err(e) => {
+                                debug!("Failed to fetch devices on startup: {e}");
+                            }
+                        }
                     });
                 });
             }
