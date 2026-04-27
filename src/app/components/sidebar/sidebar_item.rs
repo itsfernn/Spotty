@@ -36,9 +36,9 @@ impl SidebarDestination {
     pub fn title(&self) -> String {
         match self {
             // translators: This is a sidebar entry to browse to saved albums.
-            Self::Library => gettext("Library"),
+            Self::Library => gettext("Albums"),
             // translators: This is a sidebar entry to browse to saved tracks.
-            Self::SavedTracks => gettext("Saved tracks"),
+            Self::SavedTracks => gettext("Tracks"),
             // translators: This is a sidebar entry to browse to saved playlists.
             Self::NowPlaying => gettext("Now playing"),
             // translators: This is a sidebar entry that marks that the entries below are playlists.
@@ -49,10 +49,10 @@ impl SidebarDestination {
 
     pub fn icon(&self) -> &'static str {
         match self {
-            Self::Library => "library-music-symbolic",
-            Self::SavedTracks => "starred-symbolic",
+            Self::Library => "tools-media-optical-format-symbolic",
+            Self::SavedTracks => "library-music-symbolic",
             Self::NowPlaying => "music-queue-symbolic",
-            Self::SavedPlaylists => "view-app-grid-symbolic",
+            Self::SavedPlaylists => "view-media-lyrics-symbolic",
             Self::Playlist(_) => "playlist2-symbolic",
         }
     }
