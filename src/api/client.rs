@@ -468,7 +468,7 @@ impl SpotifyClient {
 
         self.request()
             .method(Method::GET)
-            .uri("/v1/me/tracks".to_string(), Some(&query))
+            .uri("/v1/me/top/tracks".to_string(), Some(&query))
     }
 
     pub(crate) fn get_saved_tracks(
