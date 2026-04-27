@@ -441,6 +441,21 @@ impl SpotifyClient {
             .json_body(PlaylistDetails { name })
     }
 
+    pub(crate) fn get_top_albums(
+        &self,
+        offset: usize,
+        limit: usize,
+    ) -> SpotifyRequest<'_, (), Page<SavedAlbum>> {
+        let query = make_query_params()
+            .append_pair("offset", &offset.to_string()[..])
+            .append_pair("limit", &limit.to_string()[..])
+            .finish();
+
+        self.request()
+            .method(Method::GET)
+            .uri("/v1/me/top/albums".to_string(), Some(&query))
+    }
+
     pub(crate) fn get_saved_albums(
         &self,
         offset: usize,
@@ -454,6 +469,21 @@ impl SpotifyClient {
         self.request()
             .method(Method::GET)
             .uri("/v1/me/albums".to_string(), Some(&query))
+    }
+
+    pub(crate) fn get_top_tracks(
+        &self,
+        offset: usize,
+        limit: usize,
+    ) -> SpotifyRequest<'_, (), Page<SavedTrack>> {
+        let query = make_query_params()
+            .append_pair("offset", &offset.to_string()[..])
+            .append_pair("limit", &limit.to_string()[..])
+            .finish();
+
+        self.request()
+            .method(Method::GET)
+            .uri("/v1/me/tracks".to_string(), Some(&query))
     }
 
     pub(crate) fn get_saved_tracks(
