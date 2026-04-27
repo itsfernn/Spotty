@@ -1,12 +1,12 @@
 {
-  "app-id": "dev.diegovsky.Riff",
+  "app-id": "dev.itsfernn.Spotty",
   "runtime": "org.gnome.Platform",
   "runtime-version": "50",
   "sdk": "org.gnome.Sdk",
   "sdk-extensions": [
     "org.freedesktop.Sdk.Extension.rust-stable"
   ],
-  "command": "riff",
+  "command": "spotty",
   "finish-args": [
     "--share=network",
     "--share=ipc",
@@ -16,15 +16,15 @@
     "--filesystem=xdg-run/pipewire-0:ro",
     "--device=dri",
     "--talk-name=org.freedesktop.secrets",
-    "--own-name=org.mpris.MediaPlayer2.Riff"
+    "--own-name=org.mpris.MediaPlayer2.Spotty"
   ],
   "separate-locales": false,
   "build-options": {
     "append-path": "/usr/lib/sdk/rust-stable/bin",
     "env": {
-      "CARGO_HOME": "/run/build/riff/cargo",
+      "CARGO_HOME": "/run/build/spotty/cargo",
       "RUST_BACKTRACE": "full",
-      "RUST_LOG": "riff=debug"
+      "RUST_LOG": "spotty=debug"
     },
     "strip": false,
     "no-debuginfo": true
@@ -42,7 +42,7 @@
   ],
   "modules": [
     {
-      "name": "riff",
+      "name": "spotty",
       "buildsystem": "meson",
       "build-options": {
         "append-path": "/usr/lib/sdk/rust-stable/bin",

@@ -1,4 +1,4 @@
-install_data('dev.diegovsky.Riff.desktop',
+install_data('dev.itsfernn.Spotty.desktop',
   install_dir: get_option('datadir') / 'applications'
 )
 
@@ -6,11 +6,11 @@ install_subdir('hicolor',
   install_dir: get_option('datadir') / 'icons'
 )
 
-install_data('dev.diegovsky.Riff.metainfo.xml',
+install_data('dev.itsfernn.Spotty.metainfo.xml',
   install_dir: get_option('datadir') / 'metainfo'
 )
 
-install_data('dev.diegovsky.Riff.gschema.xml',
+install_data('dev.itsfernn.Spotty.gschema.xml',
   install_dir: get_option('datadir') / 'glib-2.0/schemas'
 )
 
@@ -28,6 +28,6 @@ if appstreamcli.found()
     appstreamcli,
     # --no-net keeps CLI from phoning home; --pedantic catches style issues
     args: ['validate', '--no-net', '--pedantic',
-          meson.current_source_dir() / 'dev.diegovsky.Riff.metainfo.xml']
+          meson.current_source_dir() / 'dev.itsfernn.Spotty.metainfo.xml']
   )
 endif

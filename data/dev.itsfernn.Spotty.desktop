@@ -1,9 +1,9 @@
 [Desktop Entry]
 Version=1.5
-Name=Riff
-Exec=riff %u
+Name=Spotty
+Exec=spotty %u
 GenericName=Music Player
-Icon=dev.diegovsky.Riff
+Icon=dev.itsfernn.Spotty
 Terminal=false
 Type=Application
 Categories=GTK;GNOME;Music;AudioVideo;

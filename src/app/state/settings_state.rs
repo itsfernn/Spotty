@@ -1,6 +1,6 @@
 use crate::{
     app::state::{AppAction, AppEvent, UpdatableState},
-    settings::RiffSettings,
+    settings::SpottySettings,
 };
 
 #[derive(Clone, Debug)]
@@ -26,7 +26,7 @@ impl From<SettingsEvent> for AppEvent {
 #[derive(Default)]
 pub struct SettingsState {
     // Probably shouldn't be stored, the source of truth is GSettings anyway
-    pub settings: RiffSettings,
+    pub settings: SpottySettings,
 }
 
 impl UpdatableState for SettingsState {
@@ -36,7 +36,7 @@ impl UpdatableState for SettingsState {
     fn update_with(&mut self, action: std::borrow::Cow<Self::Action>) -> Vec<Self::Event> {
         match action.into_owned() {
             SettingsAction::ChangeSettings => {
-                self.settings = RiffSettings::new_from_gsettings().unwrap_or_default();
+                self.settings = SpottySettings::new_from_gsettings().unwrap_or_default();
                 vec![]
             }
         }

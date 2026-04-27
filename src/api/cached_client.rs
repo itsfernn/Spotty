@@ -131,7 +131,7 @@ pub trait SpotifyApiClient {
     fn transfer_playback(&self, device_id: String, play: bool) -> BoxFuture<SpotifyResult<()>>;
 }
 
-enum RiffCacheKey<'a> {
+enum SpottyCacheKey<'a> {
     SavedAlbums(usize, usize),
     SavedTracks(usize, usize),
     TopTracks(usize, usize),
@@ -148,7 +148,7 @@ enum RiffCacheKey<'a> {
     UserPlaylists(&'a str, usize, usize),
 }
 
-impl RiffCacheKey<'_> {
+impl SpottyCacheKey<'_> {
     fn into_raw(self) -> String {
         match self {
             Self::SavedAlbums(offset, limit) => format!("me_albums_{offset}_{limit}.json"),
@@ -199,7 +199,7 @@ impl CachedSpotifyClient {
     pub fn new(client: TokenStore) -> CachedSpotifyClient {
         CachedSpotifyClient {
             client: SpotifyClient::new(client),
-            cache: CacheManager::for_dir("riff/net").unwrap(),
+            cache: CacheManager::for_dir("spotty/net").unwrap(),
         }
     }
 
@@ -238,7 +238,7 @@ impl CachedSpotifyClient {
 
     async fn cache_get_or_write<T, O, F>(
         &self,
-        key: RiffCacheKey<'_>,
+        key: SpottyCacheKey<'_>,
         cache_policy: Option<CachePolicy>,
         write: F,
     ) -> SpotifyResult<T>
@@ -284,7 +284,7 @@ impl SpotifyApiClient for CachedSpotifyClient {
     ) -> BoxFuture<SpotifyResult<Vec<AlbumDescription>>> {
         Box::pin(async move {
             let page = self
-                .cache_get_or_write(RiffCacheKey::SavedAlbums(offset, limit), None, |etag| {
+                .cache_get_or_write(SpottyCacheKey::SavedAlbums(offset, limit), None, |etag| {
                     self.client
                         .get_saved_albums(offset, limit)
                         .etag(etag)
@@ -304,7 +304,7 @@ impl SpotifyApiClient for CachedSpotifyClient {
     fn get_top_tracks(&self, offset: usize, limit: usize) -> BoxFuture<SpotifyResult<SongBatch>> {
         Box::pin(async move {
             let page = self
-                .cache_get_or_write(RiffCacheKey::TopTracks(offset, limit), None, |etag| {
+                .cache_get_or_write(SpottyCacheKey::TopTracks(offset, limit), None, |etag| {
                     self.client
                         .get_top_tracks(offset, limit)
                         .etag(etag)
@@ -319,7 +319,7 @@ impl SpotifyApiClient for CachedSpotifyClient {
     fn get_saved_tracks(&self, offset: usize, limit: usize) -> BoxFuture<SpotifyResult<SongBatch>> {
         Box::pin(async move {
             let page = self
-                .cache_get_or_write(RiffCacheKey::SavedTracks(offset, limit), None, |etag| {
+                .cache_get_or_write(SpottyCacheKey::SavedTracks(offset, limit), None, |etag| {
                     self.client
                         .get_saved_tracks(offset, limit)
                         .etag(etag)
@@ -338,7 +338,7 @@ impl SpotifyApiClient for CachedSpotifyClient {
     ) -> BoxFuture<SpotifyResult<Vec<PlaylistDescription>>> {
         Box::pin(async move {
             let page = self
-                .cache_get_or_write(RiffCacheKey::SavedPlaylists(offset, limit), None, |etag| {
+                .cache_get_or_write(SpottyCacheKey::SavedPlaylists(offset, limit), None, |etag| {
                     self.client
                         .get_saved_playlists(offset, limit)
                         .etag(etag)
@@ -432,12 +432,12 @@ impl SpotifyApiClient for CachedSpotifyClient {
         let id = id.to_owned();
 
         Box::pin(async move {
-            let album = self.cache_get_or_write(RiffCacheKey::Album(&id), None, |etag| {
+            let album = self.cache_get_or_write(SpottyCacheKey::Album(&id), None, |etag| {
                 self.client.get_album(&id).etag(etag).send()
             });
 
             let liked = self.cache_get_or_write(
-                RiffCacheKey::AlbumLiked(&id),
+                SpottyCacheKey::AlbumLiked(&id),
                 Some(if self.client.has_token() {
                     CachePolicy::Revalidate
                 } else {
@@ -502,13 +502,13 @@ impl SpotifyApiClient for CachedSpotifyClient {
 
         Box::pin(async move {
             let album = self.cache_get_or_write(
-                RiffCacheKey::Album(&id),
+                SpottyCacheKey::Album(&id),
                 Some(CachePolicy::IgnoreExpiry),
                 |etag| self.client.get_album(&id).etag(etag).send(),
             );
 
             let songs = self.cache_get_or_write(
-                RiffCacheKey::AlbumTracks(&id, offset, limit),
+                SpottyCacheKey::AlbumTracks(&id, offset, limit),
                 None,
                 |etag| {
                     self.client
@@ -528,7 +528,7 @@ impl SpotifyApiClient for CachedSpotifyClient {
 
         Box::pin(async move {
             let playlist = self
-                .cache_get_or_write(RiffCacheKey::Playlist(&id), None, |etag| {
+                .cache_get_or_write(SpottyCacheKey::Playlist(&id), None, |etag| {
                     self.client.get_playlist(&id).etag(etag).send()
                 })
                 .await?;
@@ -548,7 +548,7 @@ impl SpotifyApiClient for CachedSpotifyClient {
         Box::pin(async move {
             let songs = self
                 .cache_get_or_write(
-                    RiffCacheKey::PlaylistTracks(&id, offset, limit),
+                    SpottyCacheKey::PlaylistTracks(&id, offset, limit),
                     None,
                     |etag| {
                         self.client
@@ -574,7 +574,7 @@ impl SpotifyApiClient for CachedSpotifyClient {
         Box::pin(async move {
             let albums = self
                 .cache_get_or_write(
-                    RiffCacheKey::ArtistAlbums(&id, offset, limit),
+                    SpottyCacheKey::ArtistAlbums(&id, offset, limit),
                     None,
                     |etag| {
                         self.client
@@ -598,14 +598,14 @@ impl SpotifyApiClient for CachedSpotifyClient {
         let id = id.to_owned();
 
         Box::pin(async move {
-            let artist = self.cache_get_or_write(RiffCacheKey::Artist(&id), None, |etag| {
+            let artist = self.cache_get_or_write(SpottyCacheKey::Artist(&id), None, |etag| {
                 self.client.get_artist(&id).etag(etag).send()
             });
 
             let albums = self.get_artist_albums(&id, 0, 20);
 
             let top_tracks =
-                self.cache_get_or_write(RiffCacheKey::ArtistTopTracks(&id), None, |etag| {
+                self.cache_get_or_write(SpottyCacheKey::ArtistTopTracks(&id), None, |etag| {
                     self.client.get_artist_top_tracks(&id).etag(etag).send()
                 });
 
@@ -668,7 +668,7 @@ impl SpotifyApiClient for CachedSpotifyClient {
         Box::pin(async move {
             let playlists = self
                 .cache_get_or_write(
-                    RiffCacheKey::UserPlaylists(&id, offset, limit),
+                    SpottyCacheKey::UserPlaylists(&id, offset, limit),
                     None,
                     |etag| {
                         self.client
@@ -692,7 +692,7 @@ impl SpotifyApiClient for CachedSpotifyClient {
         let id = id.to_owned();
 
         Box::pin(async move {
-            let user = self.cache_get_or_write(RiffCacheKey::User(&id), None, |etag| {
+            let user = self.cache_get_or_write(SpottyCacheKey::User(&id), None, |etag| {
                 self.client.get_user(&id).etag(etag).send()
             });
 

@@ -7,7 +7,7 @@ use crate::app::{
 use gio::prelude::SettingsExt;
 use libadwaita::ColorScheme;
 
-const SETTINGS: &str = "dev.diegovsky.Riff";
+const SETTINGS: &str = "dev.itsfernn.Spotty";
 
 #[derive(Clone, Debug, Default)]
 pub struct WindowGeometry {
@@ -40,7 +40,7 @@ impl WindowGeometry {
 }
 
 #[derive(Debug, Clone)]
-pub struct RiffSettings {
+pub struct SpottySettings {
     pub theme_preference: ColorScheme,
     pub volume: f64,
     pub shuffle: bool,
@@ -48,7 +48,7 @@ pub struct RiffSettings {
     pub window: WindowGeometry,
 }
 
-impl RiffSettings {
+impl SpottySettings {
     fn load_player_settings(settings: &gio::Settings) -> (f64, bool, RepeatMode) {
         let volume = settings.double("volume");
         let shuffle = settings.boolean("shuffle");
@@ -71,7 +71,7 @@ impl RiffSettings {
 }
 
 // Application settings
-impl RiffSettings {
+impl SpottySettings {
     pub fn new_from_gsettings() -> Option<Self> {
         let settings = gio::Settings::new(SETTINGS);
         let theme_preference = match settings.enum_("theme-preference") {
@@ -91,7 +91,7 @@ impl RiffSettings {
     }
 }
 
-impl Default for RiffSettings {
+impl Default for SpottySettings {
     fn default() -> Self {
         Self {
             theme_preference: ColorScheme::PreferDark,

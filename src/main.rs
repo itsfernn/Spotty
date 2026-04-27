@@ -28,7 +28,7 @@ use crate::app::dispatch::{spawn_task_handler, DispatchLoop};
 use crate::app::{state::PlaybackAction, App, AppAction, BrowserAction};
 
 fn main() {
-    let settings = settings::RiffSettings::new_from_gsettings().unwrap_or_default();
+    let settings = settings::SpottySettings::new_from_gsettings().unwrap_or_default();
     setup_gtk(&settings);
 
     // Looks like there's a side effect to declaring widgets that allows them to be referenced them in ui/blueprint files
@@ -36,14 +36,14 @@ fn main() {
     expose_custom_widgets();
 
     let gtk_app = gtk::Application::new(Some(config::APPID), ApplicationFlags::HANDLES_OPEN);
-    let builder = gtk::Builder::from_resource("/dev/diegovsky/Riff/window.ui");
+    let builder = gtk::Builder::from_resource("/dev/itsfernn/Spotty/window.ui");
     let window: libadwaita::ApplicationWindow = builder.object("window").unwrap();
 
     // In debug mode, the app id is different (see meson config) so we fix the resource path (and add a distinctive style)
     // Having a different app id allows running both the stable and development version at the same time
     if cfg!(debug_assertions) {
         window.add_css_class("devel");
-        gtk_app.set_resource_base_path(Some("/dev/diegovsky/Riff"));
+        gtk_app.set_resource_base_path(Some("/dev/itsfernn/Spotty"));
     }
 
     let context = glib::MainContext::default();
@@ -94,14 +94,14 @@ fn main() {
     std::process::exit(0);
 }
 
-fn setup_gtk(settings: &settings::RiffSettings) {
+fn setup_gtk(settings: &settings::SpottySettings) {
     // Setup logging
     env_logger::init();
 
     // Setup translations
-    textdomain("riff")
-        .and_then(|_| bindtextdomain("riff", config::LOCALEDIR))
-        .and_then(|_| bind_textdomain_codeset("riff", "UTF-8"))
+    textdomain("spotty")
+        .and_then(|_| bindtextdomain("spotty", config::LOCALEDIR))
+        .and_then(|_| bind_textdomain_codeset("spotty", "UTF-8"))
         .expect("Could not setup localization");
 
     // Setup Gtk, Adwaita...
@@ -111,12 +111,12 @@ fn setup_gtk(settings: &settings::RiffSettings) {
     let manager = libadwaita::StyleManager::default();
     manager.set_color_scheme(settings.theme_preference);
 
-    let res = gio::Resource::load(config::PKGDATADIR.to_owned() + "/riff.gresource")
+    let res = gio::Resource::load(config::PKGDATADIR.to_owned() + "/spotty.gresource")
         .expect("Could not load resources");
     gio::resources_register(&res);
 
     let provider = gtk::CssProvider::new();
-    provider.load_from_resource("/dev/diegovsky/Riff/app.css");
+    provider.load_from_resource("/dev/itsfernn/Spotty/app.css");
 
     gtk::style_context_add_provider_for_display(
         &gdk::Display::default().unwrap(),

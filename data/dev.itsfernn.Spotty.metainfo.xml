@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>dev.diegovsky.Riff</id>
-  <url type="homepage">https://github.com/Diegovsky/riff</url>
-  <url type="bugtracker">https://github.com/Diegovsky/riff/issues</url>
-  <url type="vcs-browser">https://github.com/Diegovsky/riff/</url>
+  <id>dev.itsfernn.Spotty</id>
+  <url type="homepage">https://github.com/itsfernn/spotty</url>
+  <url type="bugtracker">https://github.com/itsfernn/spotty/issues</url>
+  <url type="vcs-browser">https://github.com/itsfernn/spotty/</url>
 
-  <name>Riff</name>
-  <developer id="diegovsky@fosstodon.org">
-     <name>Diego Augusto</name>
+  <name>Spotty</name>
+  <developer id="itsfernn">
+     <name>itsfernn</name>
   </developer>
   <summary>A libadwaita/GTK4-based Spotify client</summary>
 
-  <launchable type="desktop-id">dev.diegovsky.Riff.desktop</launchable>
+  <launchable type="desktop-id">dev.itsfernn.Spotty.desktop
 
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>MIT</project_license>
@@ -29,9 +29,9 @@
   </recommends>
 
   <description>
-    <p>Enjoy listening to your favorite Spotify content with Riff: a libadwaita/GTK4-based Spotify client designed for GNOME!</p>
-    <p>Originally a fork of Spot, Riff continues development to bring the coolest Spotify client onto your desktop and mobile. Written in Rust and based on librespot.</p>
-    <p>NOTE: Riff requires a premium account!</p>
+    <p>Enjoy listening to your favorite Spotify content with Spotty: a libadwaita/GTK4-based Spotify client designed for GNOME!</p>
+    <p>Spotty uses a Spotify Connect-compatible daemon (e.g. spotifyd) for playback, removing the need for native audio backend dependencies.</p>
+    <p>NOTE: Spotty requires a premium account!</p>
     <p>Current features:</p>
     <ul>
       <li>playback control (play/pause, prev/next, seeking)</li>
@@ -48,12 +48,12 @@
 
   <screenshots>
     <screenshot type="default">
-      <image>https://raw.githubusercontent.com/Diegovsky/riff/master/data/appstream/scheme-dark.png</image>
-      <caption>Riff in dark scheme</caption>
+      <image>https://raw.githubusercontent.com/itsfernn/spotty/master/data/appstream/scheme-dark.png</image>
+      <caption>Spotty in dark scheme</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Diegovsky/riff/master/data/appstream/scheme-light.png</image>
-      <caption>Riff in light scheme</caption>
+      <image>https://raw.githubusercontent.com/itsfernn/spotty/master/data/appstream/scheme-light.png</image>
+      <caption>Spotty in light scheme</caption>
     </screenshot>
   </screenshots>
 

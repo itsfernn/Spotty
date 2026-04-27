@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schemalist gettext-domain="riff">
-  <enum id="dev.diegovsky.Riff.AudioBackend">
+<schemalist gettext-domain="spotty">
+  <enum id="dev.itsfernn.Spotty.AudioBackend">
     <value value="0" nick="pulseaudio" />
     <value value="1" nick="alsa" />
     <value value="2" nick="gstreamer" />
   </enum>
-  <enum id="dev.diegovsky.Riff.Bitrate">
+  <enum id="dev.itsfernn.Spotty.Bitrate">
     <value value="0" nick="96" />
     <value value="1" nick="160" />
     <value value="2" nick="320" />
   </enum>
-  <enum id="dev.diegovsky.Riff.ThemePref">
+  <enum id="dev.itsfernn.Spotty.ThemePref">
     <value value="0" nick="light" />
     <value value="1" nick="dark" />
     <value value="2" nick="system" />
   </enum>
-  <schema id="dev.diegovsky.Riff" path="/dev/diegovsky/Riff/">
-    <key name='theme-preference' enum='dev.diegovsky.Riff.ThemePref'>
+  <schema id="dev.itsfernn.Spotty" path="/dev/itsfernn/Spotty/">
+    <key name='theme-preference' enum='dev.itsfernn.Spotty.ThemePref'>
       <default>'system'</default>
       <summary>The theme preference</summary>
     </key>
@@ -32,11 +32,11 @@
       <default>false</default>
       <summary>A flag to enable maximized mode</summary>
     </key>
-    <key name='player-bitrate' enum='dev.diegovsky.Riff.Bitrate'>
+    <key name='player-bitrate' enum='dev.itsfernn.Spotty.Bitrate'>
       <default>'160'</default>
       <summary>Songs bitrate (96, 160, 320kbps)</summary>
     </key>
-    <key name='audio-backend' enum='dev.diegovsky.Riff.AudioBackend'>
+    <key name='audio-backend' enum='dev.itsfernn.Spotty.AudioBackend'>
       <default>'pulseaudio'</default>
       <summary>Audio backend</summary>
     </key>
@@ -50,7 +50,7 @@
     </key>
     <key name='ap-port' type='u'>
       <default>0</default>
-      <summary>Port to communicate with Spotify's server (access point). Setting to 0 (default) allows Riff to use servers running on any port.</summary>
+      <summary>Port to communicate with Spotify's server (access point). Setting to 0 (default) allows Spotty to use servers running on any port.</summary>
     </key>
     <key name='volume' type='d'>
       <default>0.7</default>

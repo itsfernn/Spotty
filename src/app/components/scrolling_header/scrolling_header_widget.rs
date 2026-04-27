@@ -7,7 +7,7 @@ mod imp {
     use super::*;
 
     #[derive(Debug, Default, CompositeTemplate)]
-    #[template(resource = "/dev/diegovsky/Riff/components/scrolling_header.ui")]
+    #[template(resource = "/dev/itsfernn/Spotty/components/scrolling_header.ui")]
     pub struct ScrollingHeaderWidget {
         #[template_child]
         pub scrolled_window: TemplateChild<gtk::ScrolledWindow>,

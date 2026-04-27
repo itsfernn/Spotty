@@ -16,7 +16,7 @@ mod imp {
     const SONG_CLASS: &str = "song--playing";
 
     #[derive(Debug, Default, CompositeTemplate)]
-    #[template(resource = "/dev/diegovsky/Riff/components/song.ui")]
+    #[template(resource = "/dev/itsfernn/Spotty/components/song.ui")]
     pub struct SongWidget {
         pub has_right_click: std::cell::Cell<bool>,
 

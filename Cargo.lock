@@ -2217,41 +2217,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "riff"
-version = "0.5.0"
-dependencies = [
- "anyhow",
- "env_logger",
- "form_urlencoded",
- "futures",
- "gdk-pixbuf",
- "gdk4",
- "gettext-rs",
- "gio",
- "glib",
- "gtk4",
- "isahc",
- "lazy_static",
- "libadwaita",
- "libc",
- "log",
- "oauth2",
- "oo7",
- "open",
- "percent-encoding",
- "rand 0.8.5",
- "ref_filter_map",
- "regex",
- "serde",
- "serde_json",
- "thiserror",
- "tokio",
- "url",
- "zbus 4.4.0",
- "zvariant 4.2.0",
-]
-
-[[package]]
 name = "ring"
 version = "0.17.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2520,6 +2485,41 @@ name = "spin"
 version = "0.9.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6980e8d7511241f8acf4aebddbb1ff938df5eebe98691418c4468d0b72a96a67"
+
+[[package]]
+name = "spotty"
+version = "0.5.0"
+dependencies = [
+ "anyhow",
+ "env_logger",
+ "form_urlencoded",
+ "futures",
+ "gdk-pixbuf",
+ "gdk4",
+ "gettext-rs",
+ "gio",
+ "glib",
+ "gtk4",
+ "isahc",
+ "lazy_static",
+ "libadwaita",
+ "libc",
+ "log",
+ "oauth2",
+ "oo7",
+ "open",
+ "percent-encoding",
+ "rand 0.8.5",
+ "ref_filter_map",
+ "regex",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tokio",
+ "url",
+ "zbus 4.4.0",
+ "zvariant 4.2.0",
+]
 
 [[package]]
 name = "stable_deref_trait"

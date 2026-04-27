@@ -11,7 +11,7 @@ mod imp {
     use super::*;
 
     #[derive(Debug, Default, CompositeTemplate)]
-    #[template(resource = "/dev/diegovsky/Riff/components/artist.ui")]
+    #[template(resource = "/dev/itsfernn/Spotty/components/artist.ui")]
     pub struct ArtistWidget {
         #[template_child]
         pub artist: TemplateChild<gtk::Label>,

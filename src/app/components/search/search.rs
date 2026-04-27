@@ -15,7 +15,7 @@ mod imp {
     use super::*;
 
     #[derive(Debug, Default, CompositeTemplate)]
-    #[template(resource = "/dev/diegovsky/Riff/components/search.ui")]
+    #[template(resource = "/dev/itsfernn/Spotty/components/search.ui")]
     pub struct SearchResultsWidget {
         #[template_child]
         pub main_header: TemplateChild<libadwaita::HeaderBar>,

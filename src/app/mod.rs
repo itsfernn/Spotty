@@ -1,6 +1,6 @@
 use crate::api::{CachedSpotifyClient, TokenStore};
 use crate::connect::ConnectCommand;
-use crate::settings::{RiffSettings, StateTracker};
+use crate::settings::{SpottySettings, StateTracker};
 use futures::channel::mpsc::UnboundedSender;
 use std::rc::Rc;
 use std::sync::Arc;
@@ -30,7 +30,7 @@ pub use rng::LazyRandomIndex;
 
 // Where all the app logic happens
 pub struct App {
-    settings: RiffSettings,
+        settings: SpottySettings,
     // The builder instance used to properly configure all the widgets created at startup
     builder: gtk::Builder,
     // All the "components" that will be notified of things happening throughout the app
@@ -44,7 +44,7 @@ pub struct App {
 
 impl App {
     pub fn new(
-        settings: RiffSettings,
+    settings: SpottySettings,
         builder: gtk::Builder,
         sender: UnboundedSender<AppAction>,
         worker: Worker,
@@ -147,7 +147,7 @@ impl App {
     }
 
     fn make_window(
-        settings: &RiffSettings,
+        settings: &SpottySettings,
         builder: &gtk::Builder,
         app_model: Rc<AppModel>,
     ) -> Box<impl EventListener> {

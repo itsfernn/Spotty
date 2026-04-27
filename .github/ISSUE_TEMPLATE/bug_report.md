@@ -29,7 +29,7 @@ If applicable, add screenshots to help explain your problem.
 **Stack trace:**
 If applicable, run the application from a terminal and paste relevant log output.
 ```
-flatpak run --env=RUST_BACKTRACE=full dev.diegovsky.Riff
+flatpak run --env=RUST_BACKTRACE=full dev.itsfernn.Spotty
 ```
 
 **Additional context**

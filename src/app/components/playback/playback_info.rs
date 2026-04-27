@@ -8,7 +8,7 @@ mod imp {
     use super::*;
 
     #[derive(Debug, Default, CompositeTemplate)]
-    #[template(resource = "/dev/diegovsky/Riff/components/playback_info.ui")]
+    #[template(resource = "/dev/itsfernn/Spotty/components/playback_info.ui")]
     pub struct PlaybackInfoWidget {
         #[template_child]
         pub playing_image: TemplateChild<gtk::Picture>,

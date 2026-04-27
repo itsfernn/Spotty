@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use futures::channel::mpsc::UnboundedSender;
 
-use crate::api::{oauth2::RiffOauthClient, TokenStore};
+use crate::api::{oauth2::SpottyOauthClient, TokenStore};
 use crate::app::components::EventListener;
 use crate::app::models::ConnectDevice;
 use crate::app::state::{LoginAction, LoginEvent, LoginStartedEvent, PlaybackAction, PlaybackEvent};
@@ -88,7 +88,7 @@ impl PlayerNotifier {
                 std::thread::spawn(move || {
                     let rt = tokio::runtime::Runtime::new().expect("Failed to create tokio runtime");
                     rt.block_on(async {
-                        let oauth = RiffOauthClient::new(token_store);
+                        let oauth = SpottyOauthClient::new(token_store);
                         match oauth.spawn_authcode_listener(|| {}).await {
                             Ok(challenge) => {
                                 sender
@@ -133,7 +133,7 @@ impl PlayerNotifier {
                 std::thread::spawn(move || {
                     let rt = tokio::runtime::Runtime::new().expect("Failed to create tokio runtime");
                     rt.block_on(async {
-                        let oauth = RiffOauthClient::new(token_store);
+                        let oauth = SpottyOauthClient::new(token_store);
                         match oauth.get_valid_token().await {
                             Ok(_creds) => {
                                 info!("Restored session");
@@ -159,7 +159,7 @@ impl PlayerNotifier {
                 std::thread::spawn(move || {
                     let rt = tokio::runtime::Runtime::new().expect("Failed to create tokio runtime");
                     rt.block_on(async {
-                        let oauth = RiffOauthClient::new(token_store);
+                        let oauth = SpottyOauthClient::new(token_store);
                         match oauth.refresh_token_at_expiry().await {
                             Ok(_) => {
                                 sender

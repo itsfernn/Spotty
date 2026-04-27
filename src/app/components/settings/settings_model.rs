@@ -1,6 +1,6 @@
 use crate::app::state::{PlaybackAction, SettingsAction};
 use crate::app::{ActionDispatcher, AppModel};
-use crate::settings::RiffSettings;
+use crate::settings::SpottySettings;
 use std::rc::Rc;
 
 pub struct SettingsModel {
@@ -28,7 +28,7 @@ impl SettingsModel {
     }
 
     #[allow(dead_code)]
-    pub fn settings(&self) -> RiffSettings {
+    pub fn settings(&self) -> SpottySettings {
         let state = self.app_model.get_state();
         state.settings.settings.clone()
     }

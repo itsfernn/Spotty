@@ -8,7 +8,7 @@ use libadwaita::prelude::*;
 
 use super::SettingsModel;
 
-const SETTINGS: &str = "dev.diegovsky.Riff";
+const SETTINGS: &str = "dev.itsfernn.Spotty";
 
 mod imp {
 
@@ -16,7 +16,7 @@ mod imp {
     use libadwaita::subclass::prelude::*;
 
     #[derive(Debug, Default, CompositeTemplate)]
-    #[template(resource = "/dev/diegovsky/Riff/components/settings.ui")]
+    #[template(resource = "/dev/itsfernn/Spotty/components/settings.ui")]
     pub struct SettingsDialog {
         #[template_child]
         pub player_bitrate: TemplateChild<libadwaita::ComboRow>,

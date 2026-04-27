@@ -1,30 +1,36 @@
-<h1 align="center"> Riff </h1>
+<h1 align="center"> Spotty </h1>
 <h4 align="center"> A libadwaita/GTK4-based Spotify client </h4>
 
-![showcase](https://github.com/user-attachments/assets/50ea171e-3983-403d-90ba-a165a37b32e1)
+<!-- TODO: Add showcase screenshot -->
 
-<div align="center">
-    <a href='https://flathub.org/apps/details/dev.diegovsky.Riff'><img width='130' alt='Download on Flathub' src='https://flathub.org/assets/badges/flathub-badge-en.png'/></a>
-</div>
-<br>
+Enjoy listening to your favorite Spotify content with **Spotty**: a libadwaita/GTK4-based Spotify client designed for GNOME!
 
-Enjoy listening to your favorite Spotify content with **Riff**: a libadwaita/GTK4-based Spotify client designed for GNOME!
+Spotty is a fork of [Riff](https://github.com/Diegovsky/riff) (which itself was a fork of [Spot](https://github.com/xou816/spot)). It removes the native audio backend dependencies by delegating playback to a Spotify Connect-compatible daemon such as [spotifyd](https://github.com/Spotifyd/spotifyd), simplifying the architecture and enabling features like Spotify Connect out of the box.
 
-Originally a fork of [Spot](https://github.com/xou816/spot),  Riff continues development to bring the coolest Spotify client onto your desktop and mobile. Written in Rust and based on [librespot](https://github.com/librespot-org/librespot/).
-
-If you have any feature suggestions or want to contribute to the project, feel free to leave an issue / pull request or join the discussion on our [Discord server](https://discord.gg/SYuYsjzWbm)!
-
-*Note*: AI contributions in any part are not welcome. 
+> [!NOTE]
+> **Spotty requires a premium Spotify account and a Spotify Connect daemon (e.g. spotifyd) running!**
 
 ## Installing
 
-> [!NOTE]
-> **Riff requires a premium account to work!**
+### From source
 
-Riff is currently only available on Flathub. Install with the command below:
-```sh
-flatpak install flathub dev.diegovsky.Riff
+Requires Rust (stable), **GTK4**, **libadwaita**, and **blueprint-compiler**.
+
+With meson:
+
 ```
+meson setup target -Dbuildtype=debug -Doffline=false --prefix="$HOME/.local"
+ninja install -C target
+meson test -C target --verbose
+```
+
+This will install a `.desktop` file and the `spotty` executable in `~/.local/bin`.
+
+To build an optimized release build, use `-Dbuildtype=release` instead.
+
+### With GNOME Builder and flatpak
+
+Open the project in GNOME Builder and configure with the `dev.itsfernn.Spotty` JSON. Then build.
 
 ## Usage notes
 
@@ -32,18 +38,14 @@ flatpak install flathub dev.diegovsky.Riff
 
 It is recommended to install a libsecret compliant keyring application, such as [GNOME Keyring](https://wiki.gnome.org/action/show/Projects/GnomeKeyring) (aka seahorse). This will allow saving your password securely between launches.
 
-In GNOME, things should work out of the box. It might be a bit trickier to get it working in other DEs: see this [ArchWiki entry](https://wiki.archlinux.org/index.php/GNOME/Keyring) for detailed explanations on how to automatically start the daemon with your session.
+### Daemon setup
 
-Bear special attention to the fact that to enable automatic login, you might have to use the same password for your user account and for the keyring, and that the keyring might need to be [set as default](https://wiki.archlinux.org/index.php/GNOME/Keyring#Passwords_are_not_remembered).
-
-See [this comment](https://github.com/xou816/spot/issues/92#issuecomment-801852593) for more details!
+Spotty requires a Spotify Connect daemon running (e.g., [spotifyd](https://github.com/Spotifyd/spotifyd)). Once the daemon is connected, Spotty will appear as a remote control for it.
 
 ## Features
 
-**Only works with premium accounts!**
-
-- playback control (play/pause, prev/next, seeking, shuffle, repeat (none, all, song))
-- selection mode: easily browse and select mutliple tracks to queue them
+- playback control (play/pause, prev/next, seeking, shuffle, repeat)
+- selection mode: easily browse and select multiple tracks to queue them
 - browse your saved albums and playlists
 - search albums and artists
 - view an artist's releases
@@ -54,76 +56,6 @@ See [this comment](https://github.com/xou816/spot/issues/92#issuecomment-8018525
 - playlist management (creation and edition)
 - liked tracks
 
-## Contributing
+## License
 
-Contributions are welcome! If you wish, add yourself to the `AUTHORS` files when submitting your contribution.
-
-For any large feature/change, **please** open an issue first to discuss implementation and design decisions.
-
-### Translating
-
-Translations are managed using `gettext` and are available in the `po/` subdirectory.
-
-**Please use [POEditor](https://poeditor.com/join/project?hash=xfVrpQfRBM) to submit translations.**
-
-If you feel like it, you are welcome to open a PR to be added to the `TRANSLATORS` file!
-
-## Building
-
-### With GNOME Builder and flatpak
-
-Pre-requisite: install the `org.freedesktop.Sdk.Extension.rust-stable` SDK extension with flatpak. Builder might do this for you automatically, but it will install an older version; make sure  the version installed matches the version of the Freedesktop SDK GNOME uses.
-
-Open the project in GNOME Builder and make the `dev.diegovsky.Riff.development.json` configuration active. Then build :)
-
-### Manually
-
-Requires Rust (stable), **GTK4**, and a couple other things. Also requires **libadwaita** and **blueprint-compiler**: they are not packaged on all distros at the moment, you might have to build them yourself!
-
-With meson:
-
-```
-meson setup target -Dbuildtype=debug -Doffline=false --prefix="$HOME/.local"
-ninja install -C target
-# to run test/linter/etc
-meson test -C target  --verbose
-```
-
-This will install a `.desktop` file among other things, and the riff executable will be put in `.local/bin` (you might want to add it to your path).
-
-To build an optimized release build, use `-Dbuildtype=release` instead.
-
-### Regenerating potfiles
-
-When adding new `msgids`, don't forget to regenerate/update the potfiles.
-
-```
-ninja riff-pot -C target
-ninja riff-update-po -C target
-```
-
-### Pulling updated strings from POEditor
-
-We are now using POEditor and the wonderful [`poeditor-sync`](https://github.com/mick88/poeditor-sync) tool.
-
-```
-poeditor pull
-```
-
-### Regenerating sources for flatpak
-
-Using [flatpak-cargo-generator.py](https://github.com/flatpak/flatpak-builder-tools/tree/master/cargo):
-
-```
-ninja cargo-sources.json -C target
-```
-
-### Debugging
-
-Set the `RUST_LOG` env variable to the appropriate level.
-
-Debug builds (flatpak) are available from the master branch on Github (see the `riff-snaphots` action).
-
-Riff caches images and HTTP responses in `~/.cache/riff`.
-
-Ruff uses [isahc](https://github.com/sagebind/isahc), which uses libcurl, therefore you can set the `https_proxy` env variable to help with debugging. In debug mode, Riff skips SSL certificate verification.
+Licensed under the [MIT License](LICENSE). This project is a fork of [Riff](https://github.com/Diegovsky/riff) which is in turn a fork of [Spot](https://github.com/xou816/spot).
