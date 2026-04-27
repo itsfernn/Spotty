@@ -14,7 +14,7 @@ use crate::app::{
     EventListener,
 };
 
-const NUM_FIXED_ENTRIES: u32 = 6;
+const NUM_FIXED_ENTRIES: u32 = 5;
 const NUM_PLAYLISTS: usize = 20;
 
 pub struct SidebarModel {
@@ -66,8 +66,8 @@ impl SidebarModel {
         let actions = match dest {
             SidebarDestination::Library
             | SidebarDestination::SavedTracks
-            | SidebarDestination::NowPlaying
-            | SidebarDestination::SavedPlaylists => {
+            | SidebarDestination::SavedPlaylists
+            | SidebarDestination::NowPlaying => {
                 vec![
                     BrowserAction::NavigationPopTo(ScreenName::Home).into(),
                     BrowserAction::SetHomeVisiblePage(dest.id()).into(),
@@ -101,9 +101,6 @@ impl Sidebar {
         list_store.append(&SidebarItem::from_destination(SidebarDestination::Library));
         list_store.append(&SidebarItem::from_destination(
             SidebarDestination::SavedTracks,
-        ));
-        list_store.append(&SidebarItem::from_destination(
-            SidebarDestination::NowPlaying,
         ));
         list_store.append(&SidebarItem::playlists_section());
         list_store.append(&SidebarItem::create_playlist_item());
