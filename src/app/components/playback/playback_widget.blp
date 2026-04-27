@@ -129,12 +129,14 @@ template $PlaybackWidget : Box {
             valign: center;
             margin-end: 10;
             MenuButton {
+              direction: up;
               icon-name: 'audio-volume-high-symbolic';
               halign: end;
               styles [
                 "flat"
               ]
               popover: Popover{
+                position: top;
                 child: Scale {
                   inverted: true;
                   orientation: vertical;
