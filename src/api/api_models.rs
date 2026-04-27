@@ -396,20 +396,17 @@ pub struct TrackItem {
 }
 
 #[derive(Deserialize, Debug, Clone)]
-pub struct BadTrackItem {}
-
-#[derive(Deserialize, Debug, Clone)]
 #[serde(untagged)]
 pub enum FailibleTrackItem {
     Ok(Box<TrackItem>),
-    Failing(BadTrackItem),
+    Bad(serde_json::Value),
 }
 
 impl FailibleTrackItem {
     fn get(self) -> Option<TrackItem> {
         match self {
             Self::Ok(track) => Some(*track),
-            Self::Failing(_) => None,
+            Self::Bad(_) => None,
         }
     }
 }

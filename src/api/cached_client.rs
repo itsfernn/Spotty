@@ -126,6 +126,8 @@ pub trait SpotifyApiClient {
     ) -> BoxFuture<SpotifyResult<()>>;
 
     fn player_state(&self) -> BoxFuture<SpotifyResult<ConnectPlayerState>>;
+
+    fn transfer_playback(&self, device_id: String, play: bool) -> BoxFuture<SpotifyResult<()>>;
 }
 
 enum RiffCacheKey<'a> {
@@ -791,6 +793,14 @@ impl SpotifyApiClient for CachedSpotifyClient {
                 .ok_or(SpotifyApiError::NoContent)?;
             Ok(result.into())
         })
+    }
+
+    fn transfer_playback(&self, device_id: String, play: bool) -> BoxFuture<SpotifyResult<()>> {
+        Box::pin(
+            self.client
+                .transfer_playback(&device_id, play)
+                .send_no_response(),
+        )
     }
 
     fn player_repeat(&self, device_id: String, mode: RepeatMode) -> BoxFuture<SpotifyResult<()>> {

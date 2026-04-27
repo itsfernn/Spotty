@@ -547,6 +547,22 @@ impl SpotifyClient {
             .uri("/v1/me/player".to_string(), None)
     }
 
+    pub(crate) fn transfer_playback(&self, device_id: &str, play: bool) -> SpotifyRequest<'_, Vec<u8>, ()> {
+        #[derive(Serialize)]
+        struct TransferRequest<'a> {
+            device_ids: Vec<&'a str>,
+            play: bool,
+        }
+        let body = TransferRequest {
+            device_ids: vec![device_id],
+            play,
+        };
+        self.request()
+            .method(Method::PUT)
+            .uri("/v1/me/player".to_string(), None)
+            .json_body(body)
+    }
+
     pub(crate) fn player_resume(&self, device_id: &str) -> SpotifyRequest<'_, (), ()> {
         let query = make_query_params()
             .append_pair("device_id", device_id)

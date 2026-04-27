@@ -226,6 +226,8 @@ impl ConnectPlayer {
     pub async fn handle_command(&self, command: ConnectCommand) -> Option<()> {
         let device_lost = match command {
             ConnectCommand::SetDevice(new_device_id) => {
+                let _old_id = self.device_id.write().ok()?.take();
+                let _ = self.api.transfer_playback(new_device_id.clone(), true).await;
                 self.device_id.write().ok()?.replace(new_device_id);
                 self.sync_state().await;
                 false
