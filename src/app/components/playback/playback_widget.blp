@@ -49,27 +49,27 @@ template $PlaybackWidget : Box {
     height-request: 1;
 
     Adw.Breakpoint {
-      condition("max-width:600sp")
+      condition("max-width:800sp")
 
       setters {
         volume-stack.visible-child-name: 'slider-button';
       }
     }
 
-    child: Box {
-      orientation: horizontal;
+    child: CenterBox {
       hexpand: true;
+      shrink-center-last: true;
 
-      $PlaybackInfoWidget now_playing {
+      start-widget: $PlaybackInfoWidget now_playing {
         hexpand: true;
-        halign: start;
+        halign: fill;
         valign: center;
-      }
+      };
 
-      Box {
+      center-widget: Box {
         halign: center;
         valign: center;
-        spacing: 4;
+        spacing: 20;
 
         $DeviceSelectorWidget device_selector {
         }
@@ -86,9 +86,9 @@ template $PlaybackWidget : Box {
           icon-name: "media-playlist-queue-symbolic";
           tooltip-text: _("Queue");
         }
-      }
+      };
 
-      Stack volume-stack {
+      end-widget: Stack volume-stack {
         visible-child-name: "slider";
         hexpand: true;
         halign: end;
@@ -102,7 +102,7 @@ template $PlaybackWidget : Box {
             }
 
             Scale volume_slider {
-              hexpand: true;
+              width-request: 150;
               show-fill-level: true;
               restrict-to-fill-level: false;
               value-pos: left;
@@ -145,7 +145,7 @@ template $PlaybackWidget : Box {
             }
           };
         }
-      }
+      };
     };
   }
 }
