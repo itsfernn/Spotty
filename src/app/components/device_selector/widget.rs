@@ -136,8 +136,10 @@ impl DeviceSelectorWidget {
             None => "audio-x-generic-symbolic",
             Some(connect) => match connect.kind {
                 ConnectDeviceKind::Phone => "phone-symbolic",
-                ConnectDeviceKind::Computer => "computer-symbolic",
+                ConnectDeviceKind::Computer => "laptop-symbolic",
                 ConnectDeviceKind::Speaker => "audio-speakers-symbolic",
+                ConnectDeviceKind::Tablet => "tablet-symbolic",
+                ConnectDeviceKind::Tv => "computer-symbolic",
                 ConnectDeviceKind::Other => "audio-x-generic-symbolic",
             },
         };

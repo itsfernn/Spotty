@@ -656,6 +656,8 @@ impl From<Device> for ConnectDevice {
             "smartphone" => ConnectDeviceKind::Phone,
             "computer" => ConnectDeviceKind::Computer,
             "speaker" => ConnectDeviceKind::Speaker,
+            "tablet" => ConnectDeviceKind::Tablet,
+            "tv" => ConnectDeviceKind::Tv,
             _ => ConnectDeviceKind::Other,
         };
         Self {

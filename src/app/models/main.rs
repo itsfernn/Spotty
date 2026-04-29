@@ -122,6 +122,8 @@ pub enum ConnectDeviceKind {
     Phone,
     Computer,
     Speaker,
+    Tablet,
+    Tv,
     Other,
 }
 
