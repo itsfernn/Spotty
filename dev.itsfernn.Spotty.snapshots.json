@@ -52,7 +52,7 @@
       },
       "config-opts": [
         "-Doffline=true",
-        "-Dbuildtype=debug"
+        "-Dbuildtype=release"
       ],
       "sources": [
         {
