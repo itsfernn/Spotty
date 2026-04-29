@@ -1,14 +1,62 @@
 using Gtk 4.0;
 using Adw 1;
 
-template $TopTracksWidget : Adw.Bin {
+template $TopTracksWidget : Box {
   ScrolledWindow scrolled_window {
     vexpand: true;
+    hscrollbar-policy: never;
 
-    Adw.ClampScrollable {
-      maximum-size: 900;
+    Box {
+      orientation: vertical;
+      spacing: 16;
+      margin-start: 8;
+      margin-end: 8;
+      margin-top: 8;
+      margin-bottom: 8;
 
-      ListView song_list {
+      Box {
+        orientation: vertical;
+        spacing: 8;
+
+        Label {
+          halign: start;
+          margin-start: 8;
+          margin-end: 8;
+
+          label: _("Top artists");
+
+          styles [
+            "title-4",
+          ]
+        }
+
+        FlowBox artist_results {
+          height-request: 100;
+          hexpand: true;
+          min-children-per-line: 1;
+          selection-mode: none;
+          activate-on-single-click: false;
+        }
+      }
+
+      Box {
+        orientation: vertical;
+        spacing: 8;
+
+        Label {
+          halign: start;
+          margin-start: 8;
+          margin-end: 8;
+
+          label: _("Top tracks");
+
+          styles [
+            "title-4",
+          ]
+        }
+
+        ListView song_list {
+        }
       }
     }
   }

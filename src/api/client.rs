@@ -456,6 +456,21 @@ impl SpotifyClient {
             .uri("/v1/me/albums".to_string(), Some(&query))
     }
 
+    pub(crate) fn get_top_artists(
+        &self,
+        offset: usize,
+        limit: usize,
+    ) -> SpotifyRequest<'_, (), Page<Artist>> {
+        let query = make_query_params()
+            .append_pair("offset", &offset.to_string()[..])
+            .append_pair("limit", &limit.to_string()[..])
+            .finish();
+
+        self.request()
+            .method(Method::GET)
+            .uri("/v1/me/top/artists".to_string(), Some(&query))
+    }
+
     pub(crate) fn get_top_tracks(
         &self,
         offset: usize,

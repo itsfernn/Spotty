@@ -209,6 +209,7 @@ pub struct HomeState {
     pub playlists: ListStore<AlbumModel>,
     pub saved_tracks: SongListModel,
     pub top_tracks: SongListModel,
+    pub top_artists: Vec<ArtistSummary>,
 }
 
 impl Default for HomeState {
@@ -222,6 +223,7 @@ impl Default for HomeState {
             playlists: ListStore::new(),
             saved_tracks: SongListModel::new(50),
             top_tracks: SongListModel::new(50),
+            top_artists: Vec::new(),
         }
     }
 }
@@ -342,6 +344,10 @@ impl UpdatableState for HomeState {
                 } else {
                     vec![]
                 }
+            }
+            BrowserAction::SetTopArtists(artists) => {
+                self.top_artists = artists.clone();
+                vec![BrowserEvent::TopArtistsUpdated]
             }
             _ => vec![],
         }

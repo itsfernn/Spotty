@@ -1,31 +1,39 @@
 using Gtk 4.0;
 using Adw 1;
 
-template $ArtistWidget : Box {
-  orientation: vertical;
+template $ArtistWidget : Adw.Bin {
+  width-request: 200;
 
-  Button avatar_btn {
-    vexpand: true;
-    width-request: 150;
-    height-request: 150;
+  styles [
+    "card",
+  ]
+
+  Button btn {
     receives-default: true;
-    halign: center;
-    valign: center;
     has-frame: false;
+    halign: fill;
+    valign: fill;
 
-    Adw.Avatar avatar {
-      halign: center;
-      valign: center;
-      show-initials: true;
-      size: 150;
+    Box {
+      orientation: horizontal;
+      spacing: 8;
+      margin-start: 8;
+      margin-end: 8;
+      margin-top: 8;
+      margin-bottom: 8;
+
+      Adw.Avatar avatar {
+        show-initials: true;
+        size: 48;
+      }
+
+      Label artist {
+        hexpand: true;
+        halign: start;
+        valign: center;
+        ellipsize: end;
+        xalign: 0;
+      }
     }
-
-    styles [
-      "circular",
-    ]
-  }
-
-  Label artist {
-    label: "Artist Name";
   }
 }

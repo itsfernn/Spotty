@@ -4,10 +4,11 @@ use gtk::CompositeTemplate;
 use std::rc::Rc;
 
 use super::TopTracksModel;
-use crate::app::components::{Component, EventListener, Playlist};
+use crate::app::components::utils::wrap_flowbox_item;
+use crate::app::components::{ArtistWidget, Component, EventListener, Playlist};
+use crate::app::models::ArtistModel;
 use crate::app::state::LoginEvent;
-use crate::app::{AppEvent, Worker};
-use libadwaita::subclass::prelude::BinImpl;
+use crate::app::{AppEvent, BrowserEvent, Worker};
 
 mod imp {
 
@@ -21,13 +22,16 @@ mod imp {
 
         #[template_child]
         pub scrolled_window: TemplateChild<gtk::ScrolledWindow>,
+
+        #[template_child]
+        pub artist_results: TemplateChild<gtk::FlowBox>,
     }
 
     #[glib::object_subclass]
     impl ObjectSubclass for TopTracksWidget {
         const NAME: &'static str = "TopTracksWidget";
         type Type = super::TopTracksWidget;
-        type ParentType = libadwaita::Bin;
+        type ParentType = gtk::Box;
 
         fn class_init(klass: &mut Self::Class) {
             klass.bind_template();
@@ -40,11 +44,11 @@ mod imp {
 
     impl ObjectImpl for TopTracksWidget {}
     impl WidgetImpl for TopTracksWidget {}
-    impl BinImpl for TopTracksWidget {}
+    impl BoxImpl for TopTracksWidget {}
 }
 
 glib::wrapper! {
-    pub struct TopTracksWidget(ObjectSubclass<imp::TopTracksWidget>) @extends gtk::Widget, libadwaita::Bin;
+    pub struct TopTracksWidget(ObjectSubclass<imp::TopTracksWidget>) @extends gtk::Widget, gtk::Box;
 }
 
 impl TopTracksWidget {
@@ -68,12 +72,35 @@ impl TopTracksWidget {
     fn song_list_widget(&self) -> &gtk::ListView {
         self.imp().song_list.as_ref()
     }
+
+    fn bind_artists<F>(&self, worker: Worker, store: &gio::ListStore, on_artist_pressed: F)
+    where
+        F: Fn(String) + Clone + 'static,
+    {
+        self.imp()
+            .artist_results
+            .bind_model(Some(store), move |item| {
+                wrap_flowbox_item(item, |artist_model| {
+                    let f = on_artist_pressed.clone();
+                    let artist = ArtistWidget::for_model(artist_model, worker.clone());
+                    artist.connect_artist_pressed(clone!(
+                        #[weak]
+                        artist_model,
+                        move || {
+                            f(artist_model.id());
+                        }
+                    ));
+                    artist
+                })
+            });
+    }
 }
 
 pub struct TopTracks {
     widget: TopTracksWidget,
     model: Rc<TopTracksModel>,
     children: Vec<Box<dyn EventListener>>,
+    artist_results_model: gio::ListStore,
 }
 
 impl TopTracks {
@@ -88,12 +115,37 @@ impl TopTracks {
             }
         ));
 
+        let artist_results_model = gio::ListStore::new::<ArtistModel>();
+
+        widget.bind_artists(
+            worker.clone(),
+            &artist_results_model,
+            clone!(
+                #[weak]
+                model,
+                move |id| {
+                    model.view_artist(id);
+                }
+            ),
+        );
+
         let playlist = Playlist::new(widget.song_list_widget().clone(), model.clone(), worker);
 
         Self {
             widget,
             model,
             children: vec![Box::new(playlist)],
+            artist_results_model,
+        }
+    }
+
+    fn update_artists(&self) {
+        if let Some(artists) = self.model.get_top_artists() {
+            self.artist_results_model.remove_all();
+            for artist in artists.iter() {
+                self.artist_results_model
+                    .append(&ArtistModel::new(&artist.name, &artist.photo, &artist.id));
+            }
         }
     }
 }
@@ -113,6 +165,9 @@ impl EventListener for TopTracks {
         match event {
             AppEvent::Started | AppEvent::LoginEvent(LoginEvent::LoginCompleted) => {
                 self.model.load_initial();
+            }
+            AppEvent::BrowserEvent(BrowserEvent::TopArtistsUpdated) => {
+                self.update_artists();
             }
             _ => {}
         }

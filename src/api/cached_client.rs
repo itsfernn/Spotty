@@ -36,6 +36,12 @@ pub trait SpotifyApiClient {
 
     fn get_top_tracks(&self, offset: usize, limit: usize) -> BoxFuture<SpotifyResult<SongBatch>>;
 
+    fn get_top_artists(
+        &self,
+        offset: usize,
+        limit: usize,
+    ) -> BoxFuture<SpotifyResult<Vec<ArtistSummary>>>;
+
     fn get_saved_albums(
         &self,
         offset: usize,
@@ -135,6 +141,7 @@ enum SpottyCacheKey<'a> {
     SavedAlbums(usize, usize),
     SavedTracks(usize, usize),
     TopTracks(usize, usize),
+    TopArtists(usize, usize),
     SavedPlaylists(usize, usize),
     Album(&'a str),
     AlbumLiked(&'a str),
@@ -154,6 +161,7 @@ impl SpottyCacheKey<'_> {
             Self::SavedAlbums(offset, limit) => format!("me_albums_{offset}_{limit}.json"),
             Self::SavedTracks(offset, limit) => format!("me_tracks_{offset}_{limit}.json"),
             Self::TopTracks(offset, limit) => format!("me_top_tracks_{offset}_{limit}.json"),
+            Self::TopArtists(offset, limit) => format!("me_top_artists_{offset}_{limit}.json"),
             Self::SavedPlaylists(offset, limit) => format!("me_playlists_{offset}_{limit}.json"),
             Self::Album(id) => format!("album_{id}.json"),
             Self::AlbumTracks(id, offset, limit) => {
@@ -313,6 +321,25 @@ impl SpotifyApiClient for CachedSpotifyClient {
                 .await?;
 
             Ok(SongBatch::from(page))
+        })
+    }
+
+    fn get_top_artists(
+        &self,
+        offset: usize,
+        limit: usize,
+    ) -> BoxFuture<SpotifyResult<Vec<ArtistSummary>>> {
+        Box::pin(async move {
+            let page: Page<Artist> = self
+                .cache_get_or_write(SpottyCacheKey::TopArtists(offset, limit), None, |etag| {
+                    self.client
+                        .get_top_artists(offset, limit)
+                        .etag(etag)
+                        .send()
+                })
+                .await?;
+
+            Ok(page.into_iter().map(|a| a.into()).collect())
         })
     }
 

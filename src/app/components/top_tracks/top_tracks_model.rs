@@ -35,6 +35,26 @@ impl TopTracksModel {
                 })
                 .await
         }));
+        self.load_top_artists();
+    }
+
+    pub fn load_top_artists(&self) {
+        let api = self.app_model.get_spotify();
+        self.dispatcher
+            .call_spotify_and_dispatch(move || async move {
+                api.get_top_artists(0, 10)
+                    .await
+                    .map(|artists| BrowserAction::SetTopArtists(artists).into())
+            });
+    }
+
+    pub fn get_top_artists(&self) -> Option<impl Deref<Target = Vec<ArtistSummary>> + '_> {
+        self.app_model
+            .map_state_opt(|s| Some(&s.browser.home_state()?.top_artists))
+    }
+
+    pub fn view_artist(&self, id: String) {
+        self.dispatcher.dispatch(AppAction::ViewArtist(id));
     }
 
     pub fn load_more(&self) -> Option<()> {

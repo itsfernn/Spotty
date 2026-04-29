@@ -39,6 +39,7 @@ pub enum BrowserAction {
     RemoveSavedTracks(Vec<String>),
     SetTopTracks(Box<SongBatch>),
     AppendTopTracks(Box<SongBatch>),
+    SetTopArtists(Vec<ArtistSummary>),
 }
 
 impl From<BrowserAction> for AppAction {
@@ -69,6 +70,7 @@ pub enum BrowserEvent {
     UserDetailsUpdated(String),
     SavedTracksUpdated,
     TopTracksUpdated,
+    TopArtistsUpdated,
 }
 
 impl From<BrowserEvent> for AppEvent {

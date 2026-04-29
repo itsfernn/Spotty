@@ -30,6 +30,12 @@ impl From<AlbumDescription> for AlbumModel {
     }
 }
 
+impl From<&ArtistSummary> for ArtistModel {
+    fn from(artist: &ArtistSummary) -> Self {
+        ArtistModel::new(&artist.name, &artist.photo, &artist.id)
+    }
+}
+
 impl From<&PlaylistDescription> for AlbumModel {
     fn from(playlist: &PlaylistDescription) -> Self {
         AlbumModel::new(

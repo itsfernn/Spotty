@@ -5,6 +5,7 @@ use gtk::CompositeTemplate;
 use crate::app::loader::ImageLoader;
 use crate::app::models::ArtistModel;
 use crate::app::Worker;
+use libadwaita::subclass::prelude::BinImpl;
 
 mod imp {
 
@@ -17,7 +18,7 @@ mod imp {
         pub artist: TemplateChild<gtk::Label>,
 
         #[template_child]
-        pub avatar_btn: TemplateChild<gtk::Button>,
+        pub btn: TemplateChild<gtk::Button>,
 
         #[template_child]
         pub avatar: TemplateChild<libadwaita::Avatar>,
@@ -27,7 +28,7 @@ mod imp {
     impl ObjectSubclass for ArtistWidget {
         const NAME: &'static str = "ArtistWidget";
         type Type = super::ArtistWidget;
-        type ParentType = gtk::Box;
+        type ParentType = libadwaita::Bin;
 
         fn class_init(klass: &mut Self::Class) {
             klass.bind_template();
@@ -40,11 +41,11 @@ mod imp {
 
     impl ObjectImpl for ArtistWidget {}
     impl WidgetImpl for ArtistWidget {}
-    impl BoxImpl for ArtistWidget {}
+    impl BinImpl for ArtistWidget {}
 }
 
 glib::wrapper! {
-    pub struct ArtistWidget(ObjectSubclass<imp::ArtistWidget>) @extends gtk::Widget, gtk::Box;
+    pub struct ArtistWidget(ObjectSubclass<imp::ArtistWidget>) @extends gtk::Widget, libadwaita::Bin;
 }
 
 impl Default for ArtistWidget {
@@ -65,7 +66,7 @@ impl ArtistWidget {
     }
 
     pub fn connect_artist_pressed<F: Fn() + 'static>(&self, f: F) {
-        self.imp().avatar_btn.connect_clicked(move |_| {
+        self.imp().btn.connect_clicked(move |_| {
             f();
         });
     }
