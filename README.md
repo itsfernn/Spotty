@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="data/hicolor/scalable/apps/Spotty.svg" alt="Spotty Logo" width="100" />
+    <img src="data/hicolor/scalable/apps/dev.itsfernn.Spotty.svg" alt="Spotty Logo" width="100" />
     <h1 align="center"> Spotty </h1>
     <h4 align="center"> A libadwaita/GTK4-based Spotify client </h4>
  </div>
